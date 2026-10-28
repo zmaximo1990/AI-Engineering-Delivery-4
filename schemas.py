@@ -40,8 +40,7 @@ class LLMAnswer(BaseModel):
     )
 
 
-# TODO: rename to "RAGAnswer"
-class RAGResponse(BaseModel):
+class RAGAnswer(BaseModel):
     """
     Final object returned by get_rag_response.
 

@@ -56,5 +56,5 @@ sequenceDiagram
 
     LLM-->>Chain: answer
     Chain->>Chain: assemble_response reads sources from metadata
-    Chain-->>Main: RAGResponse
+    Chain-->>Main: RAGAnswer
     Main-->>User: answer, sources, and fragment count

@@ -35,7 +35,7 @@ Sequence diagram: [`diagrams/ask.mermaid`](diagrams/ask.mermaid)
 
 ### Main
 
-The `main.py` invoke `get_rag_response()` after user enters a question, and it returns a `RAGResponse`:
+The `main.py` invoke `get_rag_response()` after user enters a question, and it returns a `RAGAnswer`:
 
 - `answer`: the model answer. If the context does not contain it, the model says it does not have access to that information.
 - `sources`: filenames of the retrieved chunks. These come from document metadata, not from the model.
@@ -46,7 +46,7 @@ The chain adds keys as it goes:
 1. A lambda on `RunnablePassthrough.assign` stores the retrieved `documents`.
 2. A second assign formats those documents into `context`.
 3. `build_chain` calls `.with_structured_output(LLMAnswer)` (there is no `{formato}` variable), then checks the payload and retries truncated output.
-4. A final `RunnableLambda` builds the `RAGResponse` and its source list.
+4. A final `RunnableLambda` builds the `RAGAnswer` and its source list.
 
 The hybrid retriever builds a BM25 index in memory from the chunked corpus and a `VectorStoreRetriever` over the persisted embeddings. `EnsembleRetriever` fuses the two rankings with equal weights (0.5 / 0.5) using Reciprocal Rank Fusion.
 
@@ -125,7 +125,7 @@ Delete `vectorstore/` to reindex that collection.
 | `embeddings.py` | Hugging Face and OpenAI embedding clients |
 | `llm.py` | `OpenAIClient`, `AnthropicClient`, and `GeminiClient` |
 | `factory.py` | Builds a chat client or an embeddings client from config |
-| `schemas.py` | `LLMAnswer`, `RAGResponse`, `DocumentPage`, providers, and `LLMConfig` |
+| `schemas.py` | `LLMAnswer`, `RAGAnswer`, `DocumentPage`, providers, and `LLMConfig` |
 | `settings.py` | Proyect settings loaded from the environment (`.env` file) like chunk size, `top_k`, Pinecone names, paths, and retry settings, loaded from the environment through `Settings` |
 | `data/` | Nimbus engineering notes (PDF and DOCX) used as the corpus |
 | `tests/golden_set.json` | Questions whose expected source document is known |

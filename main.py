@@ -12,7 +12,7 @@ import logging
 
 from chain import get_rag_response
 from samples import DEMO_QUESTIONS
-from schemas import LLMConfig, Provider, RAGResponse
+from schemas import LLMConfig, Provider, RAGAnswer
 
 logging.basicConfig(
     level=logging.INFO,
@@ -56,7 +56,7 @@ def prepare_index() -> int:
     logger.info("Preparing index")
     Ingestor().ingest_if_needed()
 
-def print_response(result: RAGResponse) -> None:
+def print_response(result: RAGAnswer) -> None:
     print(f"Answer: {result.answer}", flush=True)
     if result.sources:
         print("Sources: " + ", ".join(result.sources), flush=True)

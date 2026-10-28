@@ -14,7 +14,7 @@ from settings import settings
 from factory import LLMFactory
 from prompts import prompt
 from retriever import Retriever
-from schemas import LLMAnswer, LLMConfig, Provider, RAGResponse
+from schemas import LLMAnswer, LLMConfig, Provider, RAGAnswer
 
 logger = logging.getLogger(__name__)
 
@@ -107,7 +107,7 @@ def format_documents(documents: list[Document]) -> str:
     return "\n\n---\n\n".join(blocks)
 
 
-def assemble_response(payload: dict) -> RAGResponse:
+def assemble_response(payload: dict) -> RAGAnswer:
     """Build the final object from the model answer and the retrieved metadata.
 
     Sources are read from the chunk metadata. The model does not choose them.
@@ -128,7 +128,7 @@ def assemble_response(payload: dict) -> RAGResponse:
         len(documents),
         len(sources),
     )
-    return RAGResponse(
+    return RAGAnswer(
         answer=answer.answer,
         sources=sources,
         retrieved_fragments=len(documents),
@@ -193,7 +193,7 @@ def _default_config() -> LLMConfig:
 async def get_rag_response(
     query: str,
     config: LLMConfig | None = None,
-) -> RAGResponse:
+) -> RAGAnswer:
     """Search the local index and return a grounded answer with its sources."""
     cleaned = query.strip()
     if not cleaned:
