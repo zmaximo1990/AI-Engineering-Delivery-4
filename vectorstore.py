@@ -17,6 +17,7 @@ from langchain_core.vectorstores import VectorStore, VectorStoreRetriever
 from langchain_pinecone import PineconeVectorStore
 from pinecone import Pinecone, ServerlessSpec
 from pinecone.exceptions import PineconeException, UnauthorizedException
+from pydantic import SecretStr
 
 from settings import settings
 from embeddings import BaseEmbeddings
@@ -285,6 +286,8 @@ class ChromaStoreManager(VectorStoreManager):
 class PineconeStoreManager(VectorStoreManager):
     """CRUD wrapper around a Pinecone Serverless index."""
 
+    api_key_env = "PINECONE_API_KEY"
+
     def __init__(
         self,
         index_name: str | None = None,
@@ -303,13 +306,19 @@ class PineconeStoreManager(VectorStoreManager):
             self.count(),
         )
 
+    def _require_api_key(self) -> SecretStr:
+        """Return the API key from the environment, or raise if it is missing."""
+        value = os.environ.get(self.api_key_env, "").strip()
+        if not value:
+            raise ValueError(
+                f"{self.api_key_env} is not configured. "
+                "Set it in the environment before using this provider."
+            )
+        return SecretStr(value)
+
     def _init_client(self) -> Pinecone:
         """Create the client and confirm the API key can reach Pinecone."""
-        api_key = os.environ.get("PINECONE_API_KEY", "").strip()
-        if not api_key:
-            raise VectorStoreError(
-                "Set PINECONE_API_KEY in the environment or in the .env file."
-            )
+        api_key = self._require_api_key().get_secret_value()
         try:
             client = Pinecone(api_key=api_key)
             client.list_indexes()
