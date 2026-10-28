@@ -1,0 +1,865 @@
+{
+  "doc_code": "NE-700",
+  "title": "Glosario de Términos Técnicos",
+  "subtitle": "Plataforma Nimbus Edge y NimbusOS 4.x",
+  "version": "1.0",
+  "date": "2026-10-28",
+  "language": "es",
+  "audience": "Soporte técnico, integradores y operaciones",
+  "description": "Definiciones de los términos, siglas y componentes que aparecen en la documentación de Nimbus Edge, con su comportamiento concreto en la plataforma y referencias a los documentos NE-100 a NE-600.",
+  "notice": "Documento ficticio generado para pruebas de ingesta RAG",
+  "entries": [
+    {
+      "id": "GLS-001",
+      "term": "nimbusd",
+      "aliases": [
+        "agente nimbusd",
+        "agente de borde"
+      ],
+      "category": "Software del gateway",
+      "definition": "Proceso principal de NimbusOS que se ejecuta en el gateway.",
+      "in_nimbus_edge": "Muestrea las fuentes, normaliza los datos, los guarda temporalmente en el buffer y los publica por MQTT. Si deja de responder durante watchdog.timeout_s (60 segundos por defecto), el watchdog reinicia el equipo y se registra NE-E2007.",
+      "related_codes": [
+        "NE-E2007"
+      ],
+      "related_params": [
+        "watchdog.timeout_s"
+      ],
+      "see_also": [
+        "NE-500",
+        "NE-300"
+      ]
+    },
+    {
+      "id": "GLS-002",
+      "term": "nbctl",
+      "aliases": [
+        "CLI",
+        "línea de comandos"
+      ],
+      "category": "Software del gateway",
+      "definition": "Herramienta de línea de comandos para administrar el gateway.",
+      "in_nimbus_edge": "Se ejecuta por SSH (si está habilitado) o desde la consola web y reemplaza a nimbus-cli desde NimbusOS 4.0.0. Comandos habituales: nbctl status, nbctl diag --full, nbctl net test, nbctl cert status, nbctl time sync, nbctl config validate, nbctl ota status y nbctl factory-reset --confirm.",
+      "related_codes": [],
+      "related_params": [],
+      "see_also": [
+        "NE-310",
+        "NE-420"
+      ]
+    },
+    {
+      "id": "GLS-003",
+      "term": "NimbusOS",
+      "aliases": [
+        "firmware",
+        "sistema operativo del gateway"
+      ],
+      "category": "Software del gateway",
+      "definition": "Sistema operativo y firmware de los gateways Nimbus Edge GX-200 y GX-200L.",
+      "in_nimbus_edge": "La rama 4.x incorporó particiones A/B, firmas Ed25519 y dm-verity en la versión 4.0.0. La última versión documentada es la 4.2.1, del 12 de septiembre de 2026. Cada versión menor recibe correcciones de errores durante 18 meses y correcciones de seguridad críticas durante 24 meses.",
+      "related_codes": [],
+      "related_params": [],
+      "see_also": [
+        "NE-420",
+        "NE-600"
+      ]
+    },
+    {
+      "id": "GLS-004",
+      "term": "Nimbus Cloud",
+      "aliases": [
+        "nube",
+        "plataforma en la nube"
+      ],
+      "category": "Plataforma",
+      "definition": "Servicio de gestión de la plataforma: broker MQTT, servicio de ingesta, base de series temporales, servicio de alarmas, API REST y Nimbus Console.",
+      "in_nimbus_edge": "Los datos de cada dispositivo se almacenan y procesan solo en la región elegida al aprovisionar: us-east, eu-west o sa-east.",
+      "related_codes": [],
+      "related_params": [],
+      "see_also": [
+        "NE-500",
+        "NE-210"
+      ]
+    },
+    {
+      "id": "GLS-005",
+      "term": "Nimbus Console",
+      "aliases": [
+        "consola"
+      ],
+      "category": "Plataforma",
+      "definition": "Interfaz web de Nimbus Cloud para administrar dispositivos y firmware.",
+      "in_nimbus_edge": "Desde ella se generan los tokens de aprovisionamiento, se descargan los paquetes .nbfw y se crean campañas de firmware.",
+      "related_codes": [],
+      "related_params": [],
+      "see_also": [
+        "NE-100",
+        "NE-410"
+      ]
+    },
+    {
+      "id": "GLS-006",
+      "term": "Tenant",
+      "aliases": [
+        "tenant_id",
+        "cliente"
+      ],
+      "category": "Plataforma",
+      "definition": "Espacio lógico de un cliente dentro de Nimbus Cloud.",
+      "in_nimbus_edge": "Agrupa los dispositivos del cliente. GET /v3/devices lista los dispositivos del tenant y el identificador tenant_id forma parte de los tópicos MQTT (nimbus/{tenant_id}/{device_id}/...).",
+      "related_codes": [],
+      "related_params": [],
+      "see_also": [
+        "NE-210",
+        "NE-510"
+      ]
+    },
+    {
+      "id": "GLS-007",
+      "term": "device_id",
+      "aliases": [
+        "identificador de dispositivo"
+      ],
+      "category": "Plataforma",
+      "definition": "Identificador único de un dispositivo en Nimbus Cloud.",
+      "in_nimbus_edge": "Tiene el formato dev_ seguido de 12 caracteres alfanuméricos, por ejemplo dev_8f3k2m9x1q4z. Hay que informarlo al abrir un caso de soporte.",
+      "related_codes": [],
+      "related_params": [],
+      "see_also": [
+        "NE-210",
+        "NE-600"
+      ]
+    },
+    {
+      "id": "GLS-008",
+      "term": "Aprovisionamiento",
+      "aliases": [
+        "alta del dispositivo",
+        "provisioning"
+      ],
+      "category": "Seguridad",
+      "definition": "Proceso que asocia un gateway nuevo a un tenant y le entrega su identidad criptográfica.",
+      "in_nimbus_edge": "Se realiza desde el asistente web, sección Nube, con un token de aprovisionamiento; el LED CLOUD pasa de ámbar parpadeante a verde fijo en menos de 2 minutos. Después de un restablecimiento de fábrica hay que repetirlo con un token nuevo.",
+      "related_codes": [
+        "NE-E1017"
+      ],
+      "related_params": [],
+      "see_also": [
+        "NE-100"
+      ]
+    },
+    {
+      "id": "GLS-009",
+      "term": "Token de aprovisionamiento",
+      "aliases": [
+        "token de alta"
+      ],
+      "category": "Seguridad",
+      "definition": "Credencial de un solo uso que autoriza el alta de un dispositivo.",
+      "in_nimbus_edge": "Se genera en Nimbus Console, vale 72 horas y solo puede usarse una vez. Si expiró o ya fue usado, el equipo registra NE-E1017 y el LED CLOUD queda en rojo fijo.",
+      "related_codes": [
+        "NE-E1017"
+      ],
+      "related_params": [],
+      "see_also": [
+        "NE-100",
+        "NE-300",
+        "NE-500"
+      ]
+    },
+    {
+      "id": "GLS-010",
+      "term": "Elemento seguro",
+      "aliases": [
+        "secure element"
+      ],
+      "category": "Seguridad",
+      "definition": "Chip de hardware que protege claves criptográficas.",
+      "in_nimbus_edge": "La clave privada del dispositivo se genera dentro del elemento seguro y nunca sale del equipo; allí también se guarda el certificado X.509 obtenido al aprovisionar.",
+      "related_codes": [],
+      "related_params": [],
+      "see_also": [
+        "NE-500",
+        "NE-100"
+      ]
+    },
+    {
+      "id": "GLS-011",
+      "term": "mTLS",
+      "aliases": [
+        "TLS mutuo",
+        "autenticación mutua",
+        "certificado de dispositivo",
+        "X.509"
+      ],
+      "category": "Seguridad",
+      "definition": "TLS mutuo: cliente y servidor se autentican entre sí con certificados.",
+      "in_nimbus_edge": "El gateway se conecta al broker MQTT con mTLS usando su certificado X.509 de dispositivo, que se rota cada 90 días. La versión mínima de TLS es 1.2 y TLS 1.3 está disponible desde NimbusOS 4.2.0. Un reloj desfasado o un certificado vencido provocan NE-E1001.",
+      "related_codes": [
+        "NE-E1001"
+      ],
+      "related_params": [
+        "security.cert_rotation_days",
+        "security.tls_min_version"
+      ],
+      "see_also": [
+        "NE-500",
+        "NE-300"
+      ]
+    },
+    {
+      "id": "GLS-012",
+      "term": "Ed25519",
+      "aliases": [
+        "firma del firmware"
+      ],
+      "category": "Seguridad",
+      "definition": "Algoritmo de firma digital de clave pública.",
+      "in_nimbus_edge": "Los paquetes de firmware .nbfw se firman con Ed25519. El equipo verifica la firma y la suma SHA-256 antes de escribir en la partición inactiva; si falla, se registra NE-E3010.",
+      "related_codes": [
+        "NE-E3010"
+      ],
+      "related_params": [],
+      "see_also": [
+        "NE-500",
+        "NE-410",
+        "NE-300"
+      ]
+    },
+    {
+      "id": "GLS-013",
+      "term": "Paquete .nbfw",
+      "aliases": [
+        "nbfw",
+        "paquete de firmware"
+      ],
+      "category": "Firmware",
+      "definition": "Formato de paquete de firmware de NimbusOS.",
+      "in_nimbus_edge": "Se descarga desde Nimbus Console y se instala con nbctl ota install --file <ruta.nbfw> o desde la interfaz web. El paquete de NimbusOS 4.2.1 pesa aproximadamente 180 MB.",
+      "related_codes": [
+        "NE-E3010"
+      ],
+      "related_params": [],
+      "see_also": [
+        "NE-410"
+      ]
+    },
+    {
+      "id": "GLS-014",
+      "term": "dm-verity",
+      "aliases": [],
+      "category": "Seguridad",
+      "definition": "Mecanismo que verifica la integridad del sistema de archivos raíz.",
+      "in_nimbus_edge": "En NimbusOS 4 el kernel verifica el sistema de archivos raíz mediante dm-verity; cualquier modificación no autorizada impide el arranque de esa partición.",
+      "related_codes": [],
+      "related_params": [],
+      "see_also": [
+        "NE-500"
+      ]
+    },
+    {
+      "id": "GLS-015",
+      "term": "Arranque seguro",
+      "aliases": [
+        "secure boot",
+        "cadena de confianza"
+      ],
+      "category": "Seguridad",
+      "definition": "Cadena de confianza que valida cada etapa del arranque.",
+      "in_nimbus_edge": "La ROM verifica el cargador de arranque, el cargador verifica el kernel y el kernel verifica el sistema de archivos raíz con dm-verity.",
+      "related_codes": [],
+      "related_params": [],
+      "see_also": [
+        "NE-500"
+      ]
+    },
+    {
+      "id": "GLS-016",
+      "term": "Particiones A/B",
+      "aliases": [
+        "slot A",
+        "slot B",
+        "partición activa",
+        "partición inactiva"
+      ],
+      "category": "Firmware",
+      "definition": "Esquema con dos particiones de sistema independientes: una activa y otra inactiva.",
+      "in_nimbus_edge": "La actualización se escribe siempre en la partición inactiva y solo se activa después de verificar el paquete y reiniciar, de modo que la versión anterior permanece intacta para el rollback. Existe desde NimbusOS 4.0.0.",
+      "related_codes": [],
+      "related_params": [],
+      "see_also": [
+        "NE-410",
+        "NE-420"
+      ]
+    },
+    {
+      "id": "GLS-017",
+      "term": "Rollback",
+      "aliases": [
+        "reversión",
+        "volver a la versión anterior"
+      ],
+      "category": "Firmware",
+      "definition": "Vuelta a la versión de firmware anterior.",
+      "in_nimbus_edge": "Automático: si la verificación posterior de 300 segundos falla, o el equipo se reinicia por watchdog antes de confirmar la versión nueva, vuelve a la partición anterior y registra NE-E3011. Manual: nbctl ota rollback, posible solo hasta la siguiente actualización; no revierte cambios de configuración.",
+      "related_codes": [
+        "NE-E3011"
+      ],
+      "related_params": [],
+      "see_also": [
+        "NE-410",
+        "NE-300"
+      ]
+    },
+    {
+      "id": "GLS-018",
+      "term": "OTA",
+      "aliases": [
+        "actualización de firmware",
+        "ventana de mantenimiento"
+      ],
+      "category": "Firmware",
+      "definition": "Siglas de over-the-air: actualización de firmware de forma remota, sin intervención física sobre el equipo.",
+      "in_nimbus_edge": "En config.yaml, la sección ota define ota.channel (stable o beta), ota.auto_update (false por defecto) y ota.window (02:00-04:00 en hora local del dispositivo). nbctl ota status muestra el estado de la última actualización.",
+      "related_codes": [],
+      "related_params": [
+        "ota.channel",
+        "ota.auto_update",
+        "ota.window"
+      ],
+      "see_also": [
+        "NE-410",
+        "NE-220"
+      ]
+    },
+    {
+      "id": "GLS-019",
+      "term": "Campaña de firmware",
+      "aliases": [
+        "rollout",
+        "oleadas"
+      ],
+      "category": "Firmware",
+      "definition": "Actualización masiva de una flota desde Nimbus Cloud, ejecutada por oleadas.",
+      "in_nimbus_edge": "Se crea con POST /v3/firmware/campaigns. Por defecto actualiza el 10 % de la flota por oleada (batch_percent), espera 30 minutos entre oleadas (pause_minutes) y se aborta si los fallos superan el 5 % (abort_failure_rate). Solo puede haber una campaña activa por conjunto de dispositivos (error 409 campaign_conflict).",
+      "related_codes": [],
+      "related_params": [],
+      "see_also": [
+        "NE-410",
+        "NE-210"
+      ]
+    },
+    {
+      "id": "GLS-020",
+      "term": "Telemetría",
+      "aliases": [
+        "métricas",
+        "muestras"
+      ],
+      "category": "Telemetría y MQTT",
+      "definition": "Datos medidos que el gateway recoge y envía a la nube.",
+      "in_nimbus_edge": "Se muestrea cada telemetry.sample_interval_ms (1000 ms por defecto), se agrupa en lotes y se publica por MQTT con QoS 1. Las métricas de sistema son cpu_temp_c, cpu_load_pct, mem_used_pct, disk_used_pct y wan_rssi_dbm (solo GX-200L). La telemetría se retiene 13 meses.",
+      "related_codes": [],
+      "related_params": [
+        "telemetry.sample_interval_ms"
+      ],
+      "see_also": [
+        "NE-500",
+        "NE-210"
+      ]
+    },
+    {
+      "id": "GLS-021",
+      "term": "Lote de telemetría",
+      "aliases": [
+        "batch",
+        "batch_id"
+      ],
+      "category": "Telemetría y MQTT",
+      "definition": "Grupo de muestras que se publica en un solo mensaje.",
+      "in_nimbus_edge": "telemetry.batch_size vale 50 por defecto (rango de 1 a 500). Cada lote lleva un batch_id que el consumidor debe usar para deduplicar. El tamaño máximo de un mensaje es de 128 KB.",
+      "related_codes": [],
+      "related_params": [
+        "telemetry.batch_size"
+      ],
+      "see_also": [
+        "NE-220",
+        "NE-510"
+      ]
+    },
+    {
+      "id": "GLS-022",
+      "term": "Buffer de telemetría",
+      "aliases": [
+        "buffer persistente",
+        "operación sin conexión"
+      ],
+      "category": "Telemetría y MQTT",
+      "definition": "Cola persistente en la eMMC donde se guardan los datos cuando no hay conexión con la nube.",
+      "in_nimbus_edge": "Su tamaño máximo es telemetry.buffer_max_mb (256 MB por defecto, de 16 a 1024). Al llenarse se aplica telemetry.buffer_policy (drop_oldest, drop_newest o block) y se registra NE-E1042. Puede cifrarse con AES-256-GCM activando security.buffer_encryption.",
+      "related_codes": [
+        "NE-E1042"
+      ],
+      "related_params": [
+        "telemetry.buffer_max_mb",
+        "telemetry.buffer_policy",
+        "security.buffer_encryption"
+      ],
+      "see_also": [
+        "NE-500",
+        "NE-300",
+        "NE-220"
+      ]
+    },
+    {
+      "id": "GLS-023",
+      "term": "Broker MQTT",
+      "aliases": [
+        "servidor MQTT"
+      ],
+      "category": "Telemetría y MQTT",
+      "definition": "Servidor que recibe y distribuye los mensajes MQTT.",
+      "in_nimbus_edge": "Nimbus Cloud lo expone en el puerto TCP 8883 con TLS; el puerto 1883 sin TLS está deshabilitado. Si no se alcanza, el equipo registra NE-E1002.",
+      "related_codes": [
+        "NE-E1002"
+      ],
+      "related_params": [],
+      "see_also": [
+        "NE-500",
+        "NE-300",
+        "NE-220"
+      ]
+    },
+    {
+      "id": "GLS-024",
+      "term": "QoS",
+      "aliases": [
+        "calidad de servicio",
+        "QoS 1"
+      ],
+      "category": "Telemetría y MQTT",
+      "definition": "Calidad de servicio de MQTT: nivel de garantía de entrega de un mensaje.",
+      "in_nimbus_edge": "Nivel 0: sin garantía de entrega. Nivel 1: al menos una vez, valor por defecto de mqtt.qos, por lo que el consumidor debe deduplicar. Nivel 2: aumenta la latencia.",
+      "related_codes": [],
+      "related_params": [
+        "mqtt.qos"
+      ],
+      "see_also": [
+        "NE-510",
+        "NE-500"
+      ]
+    },
+    {
+      "id": "GLS-025",
+      "term": "Keepalive",
+      "aliases": [
+        "keepalive MQTT"
+      ],
+      "category": "Telemetría y MQTT",
+      "definition": "Intervalo con el que el cliente MQTT avisa al broker que sigue conectado.",
+      "in_nimbus_edge": "mqtt.keepalive_interval vale 30 segundos por defecto desde NimbusOS 4.2.0 (antes 60) y acepta de 10 a 300.",
+      "related_codes": [
+        "NE-E5020"
+      ],
+      "related_params": [
+        "mqtt.keepalive_interval"
+      ],
+      "see_also": [
+        "NE-220",
+        "NE-420"
+      ]
+    },
+    {
+      "id": "GLS-026",
+      "term": "Último deseo (LWT)",
+      "aliases": [
+        "LWT",
+        "Last Will and Testament"
+      ],
+      "category": "Telemetría y MQTT",
+      "definition": "Mensaje que el broker publica cuando un cliente se desconecta de forma inesperada (Last Will and Testament).",
+      "in_nimbus_edge": "El gateway registra un LWT con el contenido offline en el tópico status y publica online al conectarse. El mensaje de estado se publica como retenido, a diferencia de la telemetría.",
+      "related_codes": [],
+      "related_params": [],
+      "see_also": [
+        "NE-510"
+      ]
+    },
+    {
+      "id": "GLS-027",
+      "term": "Watchdog",
+      "aliases": [
+        "perro guardián",
+        "reinicio por watchdog"
+      ],
+      "category": "Hardware y sistema",
+      "definition": "Temporizador de supervisión que reinicia el sistema si un proceso deja de responder.",
+      "in_nimbus_edge": "watchdog.timeout_s vale 60 segundos por defecto (de 10 a 300) y el reinicio se registra como NE-E2007. En versiones anteriores a 4.2.1 podía dispararse con modbus.poll_interval_ms menor a 200 y más de 64 registros; se corrigió en 4.2.1.",
+      "related_codes": [
+        "NE-E2007"
+      ],
+      "related_params": [
+        "watchdog.timeout_s",
+        "modbus.poll_interval_ms"
+      ],
+      "see_also": [
+        "NE-300",
+        "NE-420",
+        "NE-220"
+      ]
+    },
+    {
+      "id": "GLS-028",
+      "term": "Throttling",
+      "aliases": [
+        "reducción de frecuencia",
+        "sobretemperatura"
+      ],
+      "category": "Hardware y sistema",
+      "definition": "Reducción de la frecuencia del procesador para limitar su temperatura.",
+      "in_nimbus_edge": "Al superar 85 °C el equipo reduce la frecuencia (NE-E2015) y a 95 °C se apaga para protegerse.",
+      "related_codes": [
+        "NE-E2015"
+      ],
+      "related_params": [],
+      "see_also": [
+        "NE-300",
+        "NE-310"
+      ]
+    },
+    {
+      "id": "GLS-029",
+      "term": "RTC",
+      "aliases": [
+        "reloj de tiempo real",
+        "batería del reloj",
+        "CR2032"
+      ],
+      "category": "Hardware y sistema",
+      "definition": "Reloj de tiempo real: mantiene la hora del equipo cuando está apagado.",
+      "in_nimbus_edge": "Su batería es una pila CR2032 (repuesto NE-ACC-BAT32) y se reemplaza cada 5 años. Si el equipo estuvo mucho tiempo apagado y no sincroniza la hora, la batería puede estar agotada.",
+      "related_codes": [],
+      "related_params": [],
+      "see_also": [
+        "NE-310"
+      ]
+    },
+    {
+      "id": "GLS-030",
+      "term": "NTP",
+      "aliases": [
+        "sincronización de hora",
+        "deriva de reloj"
+      ],
+      "category": "Hardware y sistema",
+      "definition": "Protocolo de sincronización de la hora por red.",
+      "in_nimbus_edge": "Usa el puerto UDP 123 y nbctl time sync fuerza la sincronización. Si la diferencia con la referencia supera los 5 segundos se registra NE-E5001, y un reloj desfasado puede provocar NE-E1001.",
+      "related_codes": [
+        "NE-E5001",
+        "NE-E1001"
+      ],
+      "related_params": [],
+      "see_also": [
+        "NE-300",
+        "NE-310"
+      ]
+    },
+    {
+      "id": "GLS-031",
+      "term": "eMMC",
+      "aliases": [
+        "almacenamiento"
+      ],
+      "category": "Hardware y sistema",
+      "definition": "Memoria flash de almacenamiento integrada en el equipo.",
+      "in_nimbus_edge": "El GX-200 tiene 16 GB de eMMC con particiones A/B de sistema. Con menos del 10 % libre se registra NE-E3001 y con menos de 500 MB libres no se pueden instalar actualizaciones de firmware.",
+      "related_codes": [
+        "NE-E3001"
+      ],
+      "related_params": [
+        "logging.max_files"
+      ],
+      "see_also": [
+        "NE-100",
+        "NE-300",
+        "NE-410"
+      ]
+    },
+    {
+      "id": "GLS-032",
+      "term": "GX-200 y GX-200L",
+      "aliases": [
+        "GX-200",
+        "GX-200L",
+        "gateway"
+      ],
+      "category": "Hardware y sistema",
+      "definition": "Modelos de gateway industrial de borde de la plataforma Nimbus Edge.",
+      "in_nimbus_edge": "El GX-200L agrega un módem LTE Cat-4 con nano-SIM y dos antenas SMA. Ambos se alimentan con 9 a 36 V DC, operan de -30 °C a +70 °C y se montan en riel DIN de 35 mm. El modelo anterior GX-100 permanece en la rama 3.x.",
+      "related_codes": [],
+      "related_params": [],
+      "see_also": [
+        "NE-100",
+        "NE-420"
+      ]
+    },
+    {
+      "id": "GLS-033",
+      "term": "Modbus",
+      "aliases": [
+        "Modbus RTU",
+        "Modbus TCP"
+      ],
+      "category": "Modbus y campo",
+      "definition": "Protocolo industrial maestro/esclavo para leer y escribir registros de dispositivos de campo.",
+      "in_nimbus_edge": "El gateway usa Modbus RTU sobre RS-485 y, desde NimbusOS 4.1.0, Modbus TCP en el puerto 502. Funciones admitidas: 03, 04, 06 y 16. Parámetros: modbus.poll_interval_ms (500 por defecto), modbus.timeout_ms (1500) y modbus.retries (3); al agotarlos se registra NE-E2003.",
+      "related_codes": [
+        "NE-E2003"
+      ],
+      "related_params": [
+        "modbus.poll_interval_ms",
+        "modbus.timeout_ms",
+        "modbus.retries"
+      ],
+      "see_also": [
+        "NE-510",
+        "NE-300",
+        "NE-220"
+      ]
+    },
+    {
+      "id": "GLS-034",
+      "term": "RS-485",
+      "aliases": [
+        "bus serie",
+        "terminación de 120 ohmios"
+      ],
+      "category": "Modbus y campo",
+      "definition": "Estándar de bus serie de dos hilos (A y B) más referencia GND.",
+      "in_nimbus_edge": "Admite hasta 32 dispositivos sin repetidores y 1200 m a 9600 baudios, con una resistencia de terminación de 120 ohmios en los dos extremos. El GX-200 tiene un puerto RS-485 aislado y otro RS-232.",
+      "related_codes": [
+        "NE-E2003"
+      ],
+      "related_params": [],
+      "see_also": [
+        "NE-510",
+        "NE-100",
+        "NE-310"
+      ]
+    },
+    {
+      "id": "GLS-035",
+      "term": "Esclavo Modbus",
+      "aliases": [
+        "slave_id",
+        "esclavo"
+      ],
+      "category": "Modbus y campo",
+      "definition": "Dispositivo que responde a las solicitudes del gateway y se identifica con un número de 1 a 247 (slave_id).",
+      "in_nimbus_edge": "nbctl modbus scan --port rs485 --baud 9600 detecta los esclavos presentes. Si uno no responde dentro de modbus.timeout_ms se registra NE-E2003.",
+      "related_codes": [
+        "NE-E2003"
+      ],
+      "related_params": [
+        "modbus.timeout_ms"
+      ],
+      "see_also": [
+        "NE-510",
+        "NE-310",
+        "NE-300"
+      ]
+    },
+    {
+      "id": "GLS-036",
+      "term": "LTE y conmutación de WAN",
+      "aliases": [
+        "failover",
+        "módem celular",
+        "NE-E4004"
+      ],
+      "category": "Conectividad",
+      "definition": "Acceso celular de respaldo cuando falla el enlace cableado.",
+      "in_nimbus_edge": "Solo en el GX-200L (LTE Cat-4 con nano-SIM). Si la WAN por Ethernet cae durante network.wan.failover_timeout_s (45 segundos por defecto), el tráfico pasa a LTE y se registra NE-E4004; vuelve a la WAN cableada tras 120 segundos de enlace estable.",
+      "related_codes": [
+        "NE-E4004",
+        "NE-E4009"
+      ],
+      "related_params": [
+        "network.wan.failover_timeout_s"
+      ],
+      "see_also": [
+        "NE-300",
+        "NE-420"
+      ]
+    },
+    {
+      "id": "GLS-037",
+      "term": "PUK",
+      "aliases": [
+        "bloqueo de SIM"
+      ],
+      "category": "Conectividad",
+      "definition": "Código de desbloqueo de la tarjeta SIM.",
+      "in_nimbus_edge": "Después de 3 intentos con PIN incorrecto la SIM se bloquea y requiere el código PUK del operador (NE-E4009).",
+      "related_codes": [
+        "NE-E4009"
+      ],
+      "related_params": [],
+      "see_also": [
+        "NE-300",
+        "NE-310"
+      ]
+    },
+    {
+      "id": "GLS-038",
+      "term": "RMA",
+      "aliases": [
+        "reemplazo de hardware",
+        "garantía"
+      ],
+      "category": "Soporte y servicio",
+      "definition": "Autorización de devolución de mercadería: trámite para reemplazar hardware defectuoso (Return Merchandise Authorization).",
+      "in_nimbus_edge": "La garantía de hardware es de 36 meses desde la entrega. En el plan Premium el reemplazo se envía por adelantado en 2 días hábiles; en el plan Standard se envía una vez recibida y diagnosticada la unidad. La unidad de reemplazo se aprovisiona con un token nuevo.",
+      "related_codes": [],
+      "related_params": [],
+      "see_also": [
+        "NE-600"
+      ]
+    },
+    {
+      "id": "GLS-039",
+      "term": "Severidad de incidente (S1 a S4)",
+      "aliases": [
+        "S1",
+        "S2",
+        "S3",
+        "S4"
+      ],
+      "category": "Soporte y servicio",
+      "definition": "Clasificación de la gravedad de un caso de soporte.",
+      "in_nimbus_edge": "S1 crítica, S2 alta, S3 media y S4 baja. La primera respuesta a un S1 llega en 30 minutos con el plan Premium y en 4 horas hábiles con el plan Standard.",
+      "related_codes": [],
+      "related_params": [],
+      "see_also": [
+        "NE-600"
+      ]
+    },
+    {
+      "id": "GLS-040",
+      "term": "SLA y créditos de servicio",
+      "aliases": [
+        "disponibilidad",
+        "créditos"
+      ],
+      "category": "Soporte y servicio",
+      "definition": "Acuerdo de nivel de servicio: disponibilidad comprometida y compensación si no se cumple.",
+      "in_nimbus_edge": "Disponibilidad mensual de 99,9 % en Standard y 99,95 % en Premium. Si no se cumple, el crédito es del 10 %, 25 % o 50 % de la cuota mensual según el tramo, y debe solicitarse dentro de los 30 días posteriores al cierre del mes afectado.",
+      "related_codes": [],
+      "related_params": [],
+      "see_also": [
+        "NE-600"
+      ]
+    },
+    {
+      "id": "GLS-041",
+      "term": "Webhook",
+      "aliases": [
+        "webhooks",
+        "HMAC-SHA256",
+        "X-Nimbus-Signature"
+      ],
+      "category": "API REST",
+      "definition": "Notificación HTTP que Nimbus Cloud envía a una URL del cliente cuando ocurre un evento.",
+      "in_nimbus_edge": "Eventos: device.online, device.offline, alarm.raised, alarm.cleared y firmware.completed. Cada entrega lleva una firma HMAC-SHA256 en la cabecera X-Nimbus-Signature, el receptor debe responder 2xx en menos de 10 segundos y, si falla, se reintenta hasta 5 veces con espera de 1, 2, 4, 8 y 16 minutos.",
+      "related_codes": [],
+      "related_params": [],
+      "see_also": [
+        "NE-210"
+      ]
+    },
+    {
+      "id": "GLS-042",
+      "term": "Idempotency-Key",
+      "aliases": [
+        "idempotencia"
+      ],
+      "category": "API REST",
+      "definition": "Cabecera que permite repetir una solicitud POST sin ejecutarla dos veces.",
+      "in_nimbus_edge": "Repetir una solicitud con la misma clave durante 24 horas devuelve la respuesta original sin ejecutar la operación de nuevo.",
+      "related_codes": [],
+      "related_params": [],
+      "see_also": [
+        "NE-210"
+      ]
+    },
+    {
+      "id": "GLS-043",
+      "term": "Scope de la API",
+      "aliases": [
+        "scope",
+        "OAuth 2.0",
+        "client credentials"
+      ],
+      "category": "API REST",
+      "definition": "Permiso asociado a un token de acceso OAuth 2.0.",
+      "in_nimbus_edge": "Los scopes son devices:read, devices:write, telemetry:read, alarms:read, firmware:manage y webhooks:manage. Si el token no incluye el requerido, la API responde 403 insufficient_scope. Los tokens duran 3600 segundos.",
+      "related_codes": [],
+      "related_params": [],
+      "see_also": [
+        "NE-210"
+      ]
+    },
+    {
+      "id": "GLS-044",
+      "term": "Límite de uso de la API",
+      "aliases": [
+        "rate limit",
+        "429",
+        "Retry-After"
+      ],
+      "category": "API REST",
+      "definition": "Máximo de solicitudes que admite la API por API key.",
+      "in_nimbus_edge": "La API v3 admite 600 solicitudes por minuto con ráfagas de hasta 20 por segundo. Al superarlo responde 429 rate_limited con la cabecera Retry-After. La API v2 admitía 300 por minuto y deja de estar disponible el 31 de diciembre de 2026.",
+      "related_codes": [],
+      "related_params": [],
+      "see_also": [
+        "NE-210"
+      ]
+    },
+    {
+      "id": "GLS-045",
+      "term": "RBAC",
+      "aliases": [
+        "roles",
+        "admin",
+        "operator",
+        "viewer"
+      ],
+      "category": "Seguridad",
+      "definition": "Control de acceso basado en roles.",
+      "in_nimbus_edge": "Nimbus Console y la interfaz web local usan los roles admin (gestión completa, usuarios y firmware), operator (comandos, configuración y alarmas) y viewer (solo lectura). La cuenta local se bloquea durante 10 minutos tras 5 intentos fallidos de inicio de sesión.",
+      "related_codes": [],
+      "related_params": [],
+      "see_also": [
+        "NE-500",
+        "NE-100"
+      ]
+    },
+    {
+      "id": "GLS-046",
+      "term": "Residencia de datos",
+      "aliases": [
+        "región de datos"
+      ],
+      "category": "Plataforma",
+      "definition": "Región geográfica donde se almacenan y procesan los datos.",
+      "in_nimbus_edge": "Se elige al aprovisionar cada dispositivo entre us-east, eu-west y sa-east, y los datos no se replican a otras regiones.",
+      "related_codes": [],
+      "related_params": [],
+      "see_also": [
+        "NE-500",
+        "NE-100"
+      ]
+    }
+  ]
+}

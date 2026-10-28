@@ -1,6 +1,6 @@
 # Code Delivery for Module #4 | Scalable RAG with Pinecone
 
-Async Python pipeline that answers a question from a hybrid index. Files in `data/` (PDF, DOCX, Markdown, and plain text) are converted to Markdown, split into token-sized chunks, and embedded once. A LangChain LCEL chain fuses BM25 with vector similarity, asks the model to answer only from that context, and attaches the source filenames itself.
+Async Python pipeline that answers a question from a hybrid index. Files in `data/` (PDF, DOCX, Markdown, JSON, and plain text) are converted to Markdown, split into token-sized chunks, and embedded once. A LangChain LCEL chain fuses BM25 with vector similarity, asks the model to answer only from that context, and attaches the source filenames itself.
 
 ## Flows
 
@@ -118,7 +118,7 @@ Delete `vectorstore/` to reindex that collection.
 | `chain.py` | LCEL chain, `build_chain`, and `get_rag_response()` |
 | `prompts.py` | Grounded system prompt. Context and question are template variables |
 | `ingestion.py` | Lists `data/`, chunks each Markdown `DocumentPage`, and skips a populated index |
-| `extraction.py` | `AssetExtractor`: PDF, DOCX, Markdown, and plain text to Markdown `DocumentPage`s, page by page when the format has pages |
+| `extraction.py` | `AssetExtractor`: PDF, DOCX, Markdown, JSON, and plain text to Markdown `DocumentPage`s, page by page when the format has pages |
 | `processing.py` | `Chunkener`: clean text, then split at 500 tokens with 50 of overlap |
 | `retriever.py` | BM25 plus vector search, fused by `EnsembleRetriever` |
 | `vectorstore.py` | Pinecone and Chroma backends, upsert, and `as_retriever` |
@@ -127,7 +127,7 @@ Delete `vectorstore/` to reindex that collection.
 | `factory.py` | Builds a chat client, an embeddings client, or the process-wide vector store |
 | `schemas.py` | `LLMAnswer`, `RAGAnswer`, `DocumentPage`, providers, and `LLMConfig` |
 | `settings.py` | Proyect settings loaded from the environment (`.env` file) like chunk size, `top_k`, Pinecone names, paths, and retry settings, loaded from the environment through `Settings` |
-| `data/` | Nimbus engineering notes (PDF and DOCX) used as the corpus |
+| `data/` | Nimbus engineering notes (PDF, DOCX, Markdown, and JSON) used as the corpus |
 | `tests/evaluate.py` | Precision@k, Recall@k, Hit@k, and abstention on the unanswerable set |
 | `tests/golden_set.json` | 30 questions with the source document ids used for Precision@k and Recall@k |
 | `tests/unanswerable_set.json` | 10 questions the corpus does not answer, plus hallucination patterns |
@@ -137,6 +137,38 @@ Delete `vectorstore/` to reindex that collection.
 | `Dockerfile` | Image with dependencies and the local embedding model |
 | `docker-compose.yaml` | Runs `main.py` with `.env` and a mounted `vectorstore/` |
 | `.dockerignore` | Keeps secrets and the local virtualenv out of the image |
+
+## JSON to Markdown example
+
+A JSON file becomes one Markdown page. A scalar is a bold label, and underscores in the key become spaces. A list of strings becomes bullets. A list of objects becomes sections: the heading is the first non-empty string among `term`, `title`, `name`, `heading`, and `id`, and that field is left out of the body. `null`, `""`, and `[]` are dropped.
+
+```json
+{
+  "doc_code": "NE-700",
+  "entries": [
+    {
+      "term": "nimbusd",
+      "id": "GLS-001",
+      "aliases": ["agente nimbusd"],
+      "related_params": []
+    }
+  ]
+}
+```
+
+```markdown
+**doc code:** NE-700
+
+## entries
+
+### nimbusd
+
+**id:** GLS-001
+
+#### aliases
+
+- agente nimbusd
+```
 
 ## Usage
 

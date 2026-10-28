@@ -154,7 +154,7 @@
       "NE-300"
     ],
     "relevant_files": [
-      "NE-300_Catalogo_Codigos_Error.pdf"
+      "NE-300_Catalogo_Codigos_Error.md"
     ],
     "evidence": [
       {
@@ -179,7 +179,7 @@
       "NE-310"
     ],
     "relevant_files": [
-      "NE-300_Catalogo_Codigos_Error.pdf",
+      "NE-300_Catalogo_Codigos_Error.md",
       "NE-310_Manual_Mantenimiento_Troubleshooting.docx"
     ],
     "evidence": [
@@ -213,7 +213,7 @@
       "NE-410"
     ],
     "relevant_files": [
-      "NE-300_Catalogo_Codigos_Error.pdf",
+      "NE-300_Catalogo_Codigos_Error.md",
       "NE-410_Procedimiento_Actualizacion_Firmware.docx"
     ],
     "evidence": [
@@ -380,7 +380,7 @@
       "NE-220"
     ],
     "relevant_files": [
-      "NE-300_Catalogo_Codigos_Error.pdf",
+      "NE-300_Catalogo_Codigos_Error.md",
       "NE-220_Guia_Configuracion_Parametros.docx"
     ],
     "evidence": [
@@ -846,7 +846,7 @@
       "NE-420"
     ],
     "relevant_files": [
-      "NE-300_Catalogo_Codigos_Error.pdf",
+      "NE-300_Catalogo_Codigos_Error.md",
       "NE-310_Manual_Mantenimiento_Troubleshooting.docx",
       "NE-420_Notas_de_Version_NimbusOS_4x.docx"
     ],
