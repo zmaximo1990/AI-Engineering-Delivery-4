@@ -1,8 +1,41 @@
 # Code Delivery for Module #4 | Scalable RAG with Pinecone
 
-Async Python pipeline that answers a question from a hybrid index. Files in `data/` (PDF, DOCX, Markdown, and plain text) are converted to Markdown, split into token-sized chunks, and embedded once. Extraction unifies every supported format to Markdown. When the format has pages, the file is segmented and consumed page by page first; a format without pages becomes a single segment. Each segment is a `DocumentPage`. Chunking runs on that Markdown page, not on the raw file. A LangChain LCEL chain fuses BM25 with vector similarity, asks the model to answer only from that context, and attaches the source filenames itself.
+Async Python pipeline that answers a question from a hybrid index. Files in `data/` (PDF, DOCX, Markdown, and plain text) are converted to Markdown, split into token-sized chunks, and embedded once. A LangChain LCEL chain fuses BM25 with vector similarity, asks the model to answer only from that context, and attaches the source filenames itself.
 
-`get_rag_response()` returns a `RAGResponse`:
+## Flows
+
+Two passes, at a large scale. Each list links to its sequence diagram.
+
+### Ingestion
+
+Sequence diagram: [`diagrams/ingestion.mermaid`](diagrams/ingestion.mermaid)
+
+1. The user starts the process with `python main.py`.
+2. Configuration is loaded and the `Ingestor` is created, with its extractor and chunkener.
+3. The vector index is opened or created (Pinecone or Chroma), together with the embedding model.
+4. Existing chunks in the index are counted.
+5. If the index already has data, ingestion stops. The files are not embedded again.
+6. If the index is empty, supported files are listed. Text extraction is unified to Markdown, with page-by-page segmentation and consumption first when the format allows it. A format without pages becomes one segment page. Chunking runs on each `DocumentPage` after it has been converted to Markdown. Each chunk gets an id and metadata.
+7. Chunks are embedded in batches and written to the store.
+8. The number of chunks written is returned.
+
+### Ask
+
+Sequence diagram: [`diagrams/ask.mermaid`](diagrams/ask.mermaid)
+
+1. The user asks a question.
+2. The question is rejected when it is empty, and the LLM client is created.
+3. The retriever is built. Documents in `data/` are read and chunked again, without writing the index. That corpus feeds an in-memory BM25 index and a vector retriever over the persisted embeddings.
+4. Both retrievers are combined in an ensemble with equal weights (0.5 / 0.5).
+5. On the question, BM25 and vector search run in parallel. The question is embedded before the similarity search.
+6. The two rankings are fused with Reciprocal Rank Fusion. At most 5 fragments are kept.
+7. Those fragments become the prompt context and are sent to the LLM as a structured `LLMAnswer`.
+8. Empty, invalid, or truncated output is retried up to `RETRY_ATTEMPTS`.
+9. The response is assembled from chunk metadata and returned: answer, sources, and fragment count.
+
+### Main
+
+The `main.py` invoke `get_rag_response()` after user enters a question, and it returns a `RAGResponse`:
 
 - `answer`: the model answer. If the context does not contain it, the model says it does not have access to that information.
 - `sources`: filenames of the retrieved chunks. These come from document metadata, not from the model.
