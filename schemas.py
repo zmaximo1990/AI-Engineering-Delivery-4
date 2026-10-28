@@ -6,8 +6,7 @@ from pydantic import BaseModel, Field
 from settings import settings
 
 
-#TODO:  LLM providers
-class Provider(str, Enum):
+class LLMProvider(str, Enum):
     OPENAI = "openai"
     ANTHROPIC = "anthropic"
     GEMINI = "gemini"
@@ -21,7 +20,7 @@ class EmbeddingsProvider(str, Enum):
 class LLMConfig(BaseModel):
     """Provider, model, and sampling settings for one RAG run."""
 
-    provider: Provider
+    provider: LLMProvider
     model: str | None = None
     max_tokens: int = Field(default=settings.default_max_tokens, gt=0)
     temperature: float = Field(default=settings.default_temperature, ge=0.0, le=2.0)
