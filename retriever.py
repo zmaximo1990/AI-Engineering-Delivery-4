@@ -16,7 +16,11 @@ logger = logging.getLogger(__name__)
 
 
 class Retriever:
-    """Fuse lexical and vector search and return the top-k documents."""
+    """
+    Fuse lexical and vector search and return the top-k documents.
+    
+    NOTE: it is the `RAGSystem` class requested from the spec.
+    """
 
     def __init__(self, k: int = settings.hybrid_k) -> None:
         if isinstance(k, bool) or not isinstance(k, int) or k < 1:
@@ -30,6 +34,7 @@ class Retriever:
         if not documents:
             raise ValueError("No documents are available for retrieval")
 
+        # TODO: evaluate to run within an async context
         # Create the lexical retriever. It must be created in a separate thread to avoid blocking the main thread because the BM25Retriever is a I/O operation to read files from the filesystem.
         # lexical: BM25Retriever = await asyncio.to_thread(BM25Retriever.from_documents, documents)
         lexical_retriever = BM25Retriever.from_documents(documents)

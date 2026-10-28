@@ -1,5 +1,6 @@
 """Runtime settings loaded from the environment and the project ``.env`` file."""
 
+import re
 from functools import lru_cache
 from pathlib import Path
 from typing import Annotated, Self
@@ -8,6 +9,9 @@ from pydantic import BeforeValidator, Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 PROJECT_DIR = Path(__file__).resolve().parent
+
+# Leading document id in a file name, for example NE-100.
+DOC_ID = re.compile(r"^(NE-\d+)", re.IGNORECASE)
 
 
 def _comma_separated_set(value: object) -> set[str]:
@@ -39,7 +43,7 @@ class Settings(BaseSettings):
     ] = Field(default_factory=lambda: {"length", "max_tokens"})
     gemini_max_tokens: int = 1024
 
-    # Spec: chunks of at least 500 tokens with 50 tokens of overlap.
+    # Chunks of at least 500 tokens with 50 tokens of overlap.
     chunk_size: int = 500
     chunk_overlap: int = 50
     model_encoding: str = "cl100k_base"

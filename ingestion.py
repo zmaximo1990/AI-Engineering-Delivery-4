@@ -2,20 +2,17 @@
 
 import hashlib
 import logging
-import re
 from pathlib import Path
 
 from langchain_core.documents import Document
 
-from settings import settings
+from settings import DOC_ID, settings
 from extraction import AssetExtractor
 from processing import Chunkener
 from factory import VectorStoreFactory
 from vectorstore import VectorStoreManager
 
 logger = logging.getLogger(__name__)
-
-_DOC_ID = re.compile(r"^(NE-\d+)", re.IGNORECASE)
 
 
 class Ingestor:
@@ -114,7 +111,7 @@ class Ingestor:
         Return the leading NE-100 style id, or the file stem when there is none.
         """
 
-        match = _DOC_ID.match(filename)
+        match = DOC_ID.match(filename)
         if match:
             return match.group(1).upper()
         return Path(filename).stem
