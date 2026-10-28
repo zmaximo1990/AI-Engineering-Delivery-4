@@ -1,7 +1,7 @@
 # Load env before the modules that read it at import time.
 from pathlib import Path
 
-from ingestion import Ingestor, ingest_if_needed
+from ingestion import Ingestor
 from dotenv import load_dotenv
 
 load_dotenv(Path(__file__).resolve().with_name(".env"))
@@ -12,7 +12,8 @@ import logging
 
 from chain import get_rag_response
 from samples import DEMO_QUESTIONS
-from schemas import LLMConfig, Provider, RAGAnswer
+from schemas import LLMConfig, LLMProvider, RAGAnswer
+from tests.evaluate import run_evaluation
 
 logging.basicConfig(
     level=logging.INFO,
@@ -23,13 +24,13 @@ logger = logging.getLogger(__name__)
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Ask a question against the local TechCorp policy index."
+        description="Ask a question against the indexed documents, or score retrieval."
     )
     parser.add_argument(
         "-p",
         "--provider",
-        default=Provider.OPENAI.value,
-        choices=[provider.value for provider in Provider],
+        default=LLMProvider.OPENAI.value,
+        choices=[provider.value for provider in LLMProvider],
         help="LLM provider used to build LLMConfig (default: openai)",
     )
     parser.add_argument(
@@ -43,9 +44,24 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Run the grounded question and the trap question, then exit.",
     )
+    parser.add_argument(
+        "-e",
+        "--eval",
+        action="store_true",
+        help="Score the golden set and the unanswerable set, then exit.",
+    )
     args = parser.parse_args()
-    if args.demo and args.question:
-        parser.error("use either --demo or --question, not both")
+    selected = [
+        name
+        for name, enabled in (
+            ("--demo", args.demo),
+            ("--question", bool(args.question)),
+            ("--eval", args.eval),
+        )
+        if enabled
+    ]
+    if len(selected) > 1:
+        parser.error("use only one of --demo, --question, or --eval")
     return args
 
 def prepare_index() -> int:
@@ -82,9 +98,14 @@ def read_question() -> str:
 
 
 async def main(args: argparse.Namespace) -> None:
-    config = LLMConfig(provider=Provider(args.provider))
+    config = LLMConfig(provider=LLMProvider(args.provider))
     logger.info("LLMConfig initialized (provider=%s)", config.provider.value)
     prepare_index()
+
+    if args.eval:
+        await run_evaluation(config)
+        logger.info("Finished")
+        return
 
     if args.demo:
         for label, question in DEMO_QUESTIONS:

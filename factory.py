@@ -4,7 +4,7 @@ from typing import Optional
 from settings import settings
 from embeddings import BaseEmbeddings, HuggingFaceEmbeddings, OpenAIEmbeddings
 from llm import AnthropicClient, BaseLLMClient, GeminiClient, OpenAIClient
-from schemas import EmbeddingsProvider, LLMConfig, Provider
+from schemas import EmbeddingsProvider, LLMConfig, LLMProvider
 from vectorstore import VectorStoreManager
 
 logger = logging.getLogger(__name__)
@@ -25,11 +25,11 @@ class LLMFactory:
         }
 
         client: Optional[BaseLLMClient] = None
-        if config.provider == Provider.OPENAI:
+        if config.provider == LLMProvider.OPENAI:
             client = OpenAIClient(**kwargs)
-        elif config.provider == Provider.ANTHROPIC:
+        elif config.provider == LLMProvider.ANTHROPIC:
             client = AnthropicClient(**kwargs)
-        elif config.provider == Provider.GEMINI:
+        elif config.provider == LLMProvider.GEMINI:
             # Gemini spends part of the budget on thinking tokens.
             kwargs["max_tokens"] = max(config.max_tokens, settings.gemini_max_tokens)
             client = GeminiClient(**kwargs)
@@ -41,6 +41,8 @@ class LLMFactory:
 
 class EmbeddingsFactory:
     """Factory that builds an embeddings client from an EmbeddingsProvider."""
+
+    # TODO: implement singletong like "VectorStoreFactory"
 
     @staticmethod
     def create(

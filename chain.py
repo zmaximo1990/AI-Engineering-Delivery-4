@@ -14,7 +14,7 @@ from settings import settings
 from factory import LLMFactory
 from prompts import prompt
 from retriever import Retriever
-from schemas import LLMAnswer, LLMConfig, Provider, RAGAnswer
+from schemas import LLMAnswer, LLMConfig, LLMProvider, RAGAnswer
 
 logger = logging.getLogger(__name__)
 
@@ -183,9 +183,9 @@ def build_chain(config: LLMConfig) -> Runnable:
 
 def _default_config() -> LLMConfig:
     try:
-        provider = Provider(settings.default_provider)
+        provider = LLMProvider(settings.default_provider)
     except ValueError as exc:
-        allowed = ", ".join(item.value for item in Provider)
+        allowed = ", ".join(item.value for item in LLMProvider)
         raise ValueError(f"LLM_PROVIDER must be one of: {allowed}") from exc
     return LLMConfig(provider=provider)
 

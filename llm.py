@@ -9,7 +9,7 @@ from langchain_openai import ChatOpenAI
 from pydantic import SecretStr
 
 from settings import settings
-from schemas import Provider
+from schemas import LLMProvider
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ class BaseLLMClient(ABC):
     """Common interface for the LangChain chat model behind the RAG chain."""
 
     default_model: str
-    provider: Provider
+    provider: LLMProvider
     api_key_env: str
 
     def __init__(
@@ -54,7 +54,7 @@ class BaseLLMClient(ABC):
 
 class OpenAIClient(BaseLLMClient):
     default_model = "gpt-4o-mini"
-    provider = Provider.OPENAI
+    provider = LLMProvider.OPENAI
     api_key_env = "OPENAI_API_KEY"
 
     def _build_chain_model(self) -> BaseChatModel:
@@ -69,7 +69,7 @@ class OpenAIClient(BaseLLMClient):
 
 class AnthropicClient(BaseLLMClient):
     default_model = "claude-haiku-4-5-20251001"
-    provider = Provider.ANTHROPIC
+    provider = LLMProvider.ANTHROPIC
     api_key_env = "ANTHROPIC_API_KEY"
 
     def _build_chain_model(self) -> BaseChatModel:
@@ -84,7 +84,7 @@ class AnthropicClient(BaseLLMClient):
 
 class GeminiClient(BaseLLMClient):
     default_model = "models/gemini-3.8-flash"
-    provider = Provider.GEMINI
+    provider = LLMProvider.GEMINI
     api_key_env = "GEMINI_API_KEY"
 
     def _build_chain_model(self) -> BaseChatModel:
