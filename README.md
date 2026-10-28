@@ -140,7 +140,7 @@ Delete `vectorstore/` to reindex that collection.
 
 ## Usage
 
-Run from this directory. The index is opened before the prompt. With no arguments the program then reads questions from the terminal. An empty line exits.
+Run from this directory. The index is opened before the prompt. With no arguments the program then reads questions from the terminal. An empty line, or the word `exit` or `quit` (any capitalization), stops the prompt.
 
 ```bash
 python main.py

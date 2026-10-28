@@ -124,10 +124,10 @@ async def main(args: argparse.Namespace) -> None:
         return
 
     print("TechCorp policy assistant... ask away!\n\n", flush=True)
-    print("Type a question and press Enter. An empty line exits.", flush=True)
+    print("Type a question and press Enter. An empty line, exit, or quit stops the prompt.", flush=True)
     while True:
         question = read_question()
-        if not question:
+        if not question or question.lower() in {"exit", "quit"}:
             break
         try:
             await ask(config, question)
