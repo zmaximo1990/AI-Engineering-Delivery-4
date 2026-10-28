@@ -1,0 +1,154 @@
+[
+  {
+    "id": "U01",
+    "question": "¿Cuál es el precio de lista del gateway GX-200?",
+    "type": "missing_detail",
+    "reason": "Ningún documento publica precios; solo se menciona una cuota mensual sin importes.",
+    "expected_behavior": "El sistema debe indicar que la información no está en la documentación disponible y no inventar una respuesta.",
+    "near_miss_docs": [
+      "NE-600"
+    ],
+    "near_miss_files": [
+      "NE-600_Politica_Soporte_SLA.docx"
+    ],
+    "hallucination_signals": [
+      "\\$\\s?\\d",
+      "\\b\\d[\\d.,]*\\s?(USD|EUR|dólares|euros)\\b"
+    ]
+  },
+  {
+    "id": "U02",
+    "question": "¿Cuántos puertos USB tiene el GX-200 y de qué versión?",
+    "type": "missing_detail",
+    "reason": "La tabla de especificaciones no menciona puertos USB.",
+    "expected_behavior": "El sistema debe indicar que la información no está en la documentación disponible y no inventar una respuesta.",
+    "near_miss_docs": [
+      "NE-100"
+    ],
+    "near_miss_files": [
+      "NE-100_Guia_Instalacion_GX-200.pdf"
+    ],
+    "hallucination_signals": [
+      "USB\\s?[23]\\.\\d",
+      "\\b[1-4]\\s?(x\\s?)?puertos?\\s+USB"
+    ]
+  },
+  {
+    "id": "U03",
+    "question": "¿Cómo configuro el módulo Zigbee integrado del GX-200?",
+    "type": "false_premise",
+    "reason": "El gateway no tiene módulo Zigbee: las interfaces documentadas son Ethernet, RS-485, RS-232, entradas digitales, relés y LTE (GX-200L).",
+    "expected_behavior": "El sistema debe indicar que la información no está en la documentación disponible y no inventar una respuesta.",
+    "near_miss_docs": [
+      "NE-100",
+      "NE-510"
+    ],
+    "near_miss_files": [
+      "NE-100_Guia_Instalacion_GX-200.pdf",
+      "NE-510_Guia_Integracion_MQTT_Modbus.docx"
+    ],
+    "hallucination_signals": []
+  },
+  {
+    "id": "U04",
+    "question": "¿Cómo habilito IPv6 en la interfaz WAN del gateway?",
+    "type": "uncovered_topic",
+    "reason": "La documentación de red solo cubre IPv4 (DHCP, estática y LTE) y no describe IPv6.",
+    "expected_behavior": "El sistema debe indicar que la información no está en la documentación disponible y no inventar una respuesta.",
+    "near_miss_docs": [
+      "NE-220",
+      "NE-100"
+    ],
+    "near_miss_files": [
+      "NE-220_Guia_Configuracion_Parametros.docx",
+      "NE-100_Guia_Instalacion_GX-200.pdf"
+    ],
+    "hallucination_signals": []
+  },
+  {
+    "id": "U05",
+    "question": "¿Cuáles son las especificaciones técnicas del modelo GX-300?",
+    "type": "nonexistent_entity",
+    "reason": "Los documentos solo describen los modelos GX-200 y GX-200L (y mencionan el GX-100 como generación anterior); no existe el GX-300.",
+    "expected_behavior": "El sistema debe indicar que la información no está en la documentación disponible y no inventar una respuesta.",
+    "near_miss_docs": [
+      "NE-100",
+      "NE-420"
+    ],
+    "near_miss_files": [
+      "NE-100_Guia_Instalacion_GX-200.pdf",
+      "NE-420_Notas_de_Version_NimbusOS_4x.docx"
+    ],
+    "hallucination_signals": []
+  },
+  {
+    "id": "U06",
+    "question": "¿Cuál es el número de teléfono de la línea de soporte Premium?",
+    "type": "missing_detail",
+    "reason": "La política de soporte menciona una línea telefónica prioritaria pero no publica ningún número.",
+    "expected_behavior": "El sistema debe indicar que la información no está en la documentación disponible y no inventar una respuesta.",
+    "near_miss_docs": [
+      "NE-600"
+    ],
+    "near_miss_files": [
+      "NE-600_Politica_Soporte_SLA.docx"
+    ],
+    "hallucination_signals": [
+      "\\+\\d{1,3}[\\s\\-]?\\(?\\d{1,4}\\)?[\\s\\-]?\\d{3,4}[\\s\\-]?\\d{3,4}",
+      "\\b0?\\d{2,4}[\\s\\-]\\d{3,4}[\\s\\-]\\d{3,4}\\b",
+      "\\b0800[\\s\\-]?\\d{3}[\\s\\-]?\\d{3,4}\\b"
+    ]
+  },
+  {
+    "id": "U07",
+    "question": "¿En qué lenguajes de programación está disponible el SDK oficial de Nimbus Edge?",
+    "type": "uncovered_topic",
+    "reason": "Solo se documenta la API REST y los webhooks; no se menciona ningún SDK.",
+    "expected_behavior": "El sistema debe indicar que la información no está en la documentación disponible y no inventar una respuesta.",
+    "near_miss_docs": [
+      "NE-210"
+    ],
+    "near_miss_files": [
+      "NE-210_Referencia_API_REST_v3.pdf"
+    ],
+    "hallucination_signals": []
+  },
+  {
+    "id": "U08",
+    "question": "¿Qué novedades trae NimbusOS 4.3?",
+    "type": "nonexistent_entity",
+    "reason": "La última versión documentada es la 4.2.1; no hay información sobre una versión 4.3.",
+    "expected_behavior": "El sistema debe indicar que la información no está en la documentación disponible y no inventar una respuesta.",
+    "near_miss_docs": [
+      "NE-420"
+    ],
+    "near_miss_files": [
+      "NE-420_Notas_de_Version_NimbusOS_4x.docx"
+    ],
+    "hallucination_signals": []
+  },
+  {
+    "id": "U09",
+    "question": "¿Cómo conecto el gateway a un servidor OPC UA?",
+    "type": "uncovered_topic",
+    "reason": "Los protocolos documentados son Modbus RTU/TCP para campo y MQTT para la nube; OPC UA no aparece.",
+    "expected_behavior": "El sistema debe indicar que la información no está en la documentación disponible y no inventar una respuesta.",
+    "near_miss_docs": [
+      "NE-510"
+    ],
+    "near_miss_files": [
+      "NE-510_Guia_Integracion_MQTT_Modbus.docx"
+    ],
+    "hallucination_signals": []
+  },
+  {
+    "id": "U10",
+    "question": "¿Cómo despliego un clúster de Kafka con Docker Compose?",
+    "type": "out_of_domain",
+    "reason": "La pregunta es ajena al dominio del corpus (no hay nada sobre Kafka ni Docker).",
+    "expected_behavior": "El sistema debe indicar que la información no está en la documentación disponible y no inventar una respuesta.",
+    "near_miss_docs": [],
+    "near_miss_files": [],
+    "hallucination_signals": []
+  }
+]

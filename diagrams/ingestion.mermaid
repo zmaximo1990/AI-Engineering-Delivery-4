@@ -1,0 +1,70 @@
+sequenceDiagram
+    actor User
+    participant Main
+    participant Ingestor
+    participant Extractor as AssetExtractor
+    participant Chunkener
+    participant Store as VectorStoreManager
+    participant Embeddings
+    participant Index
+
+    User->>Main: python main.py
+    Main->>Main: load_dotenv
+    Main->>Ingestor: Ingestor()
+    Note over Ingestor: creates AssetExtractor and Chunkener
+    Main->>Ingestor: ingest_if_needed()
+    Ingestor->>Store: get_vector_store()
+
+    alt the store does not exist yet
+        Store->>Embeddings: EmbeddingsFactory.create()
+        alt VECTOR_STORE is pinecone
+            Store->>Index: _init_client()
+            Store->>Embeddings: embed_query to read the dimension
+            Store->>Index: _ensure_index()
+        else VECTOR_STORE is chroma
+            Store->>Index: PersistentClient and collection
+        end
+    end
+
+    Ingestor->>Store: count()
+
+    alt the index already has chunks
+        Store-->>Ingestor: count greater than 0
+        Ingestor-->>Main: 0
+        Note over Ingestor,Main: does not embed again
+    else the index is empty
+        Ingestor->>Ingestor: list_files()
+        loop each pdf, docx, md, or txt
+            Ingestor->>Extractor: extract(path)
+            alt pdf
+                Extractor->>Extractor: MarkItDown
+                opt a single page
+                    Extractor->>Extractor: pdfminer, page by page
+                end
+            else docx
+                Extractor->>Extractor: MarkItDown
+            else md or txt
+                Extractor->>Extractor: read_text
+            end
+            Extractor-->>Ingestor: list of DocumentPage
+            loop each page
+                Ingestor->>Chunkener: process_document(text)
+                Chunkener->>Chunkener: clean_text and split by tokens
+                Chunkener-->>Ingestor: chunks
+                Ingestor->>Ingestor: _doc_id and create_metadata
+            end
+        end
+        Ingestor->>Ingestor: _chunk_id with sha256
+        Ingestor->>Store: upsert_documents(ids, texts, metadata)
+        loop batches of EMBEDDING_BATCH_SIZE
+            Store->>Embeddings: embed_documents(batch)
+            Embeddings-->>Store: vectors
+            alt pinecone
+                Store->>Index: upsert in the namespace, text inside metadata
+            else chroma
+                Store->>Index: collection.upsert
+            end
+        end
+        Store-->>Ingestor: ok
+        Ingestor-->>Main: number of chunks written
+    end

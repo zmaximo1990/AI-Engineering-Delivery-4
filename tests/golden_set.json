@@ -1,0 +1,905 @@
+[
+  {
+    "id": "G01",
+    "question": "¿Cuántos segundos hay que mantener presionado el botón RESET para restablecer de fábrica el gateway y cuándo se suelta?",
+    "expected_answer": "Hay que mantenerlo presionado 10 segundos con el equipo encendido y soltarlo cuando el LED ERR emita tres destellos rojos.",
+    "key_facts": [
+      "10 segundos",
+      "tres destellos"
+    ],
+    "type": "factoid",
+    "retrieval_hint": "lexical",
+    "difficulty": "easy",
+    "relevant_docs": [
+      "NE-100"
+    ],
+    "relevant_files": [
+      "NE-100_Guia_Instalacion_GX-200.pdf"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-100",
+        "text": "mantenga presionado el botón RESET (orificio empotrado en el frente) durante 10 segundos"
+      },
+      {
+        "doc": "NE-100",
+        "text": "Suelte el botón cuando el LED ERR emita tres destellos rojos."
+      }
+    ]
+  },
+  {
+    "id": "G02",
+    "question": "¿Cómo accedo por primera vez a la configuración web del equipo y con qué credenciales?",
+    "expected_answer": "Conectando una computadora al puerto ETH1 y abriendo https://192.168.88.1:8443 (el certificado inicial es autofirmado). Usuario admin y la contraseña inicial impresa en la etiqueta del equipo (campo Init PW); el asistente obliga a cambiarla por una de al menos 12 caracteres.",
+    "key_facts": [
+      "192.168.88.1:8443",
+      "ETH1",
+      "Init PW"
+    ],
+    "type": "procedure",
+    "retrieval_hint": "semantic",
+    "difficulty": "easy",
+    "relevant_docs": [
+      "NE-100"
+    ],
+    "relevant_files": [
+      "NE-100_Guia_Instalacion_GX-200.pdf"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-100",
+        "text": "Abra un navegador e ingrese a https://192.168.88.1:8443."
+      },
+      {
+        "doc": "NE-100",
+        "text": "Inicie sesión con el usuario admin y la contraseña inicial impresa en la etiqueta del equipo, en el campo Init PW."
+      }
+    ]
+  },
+  {
+    "id": "G03",
+    "question": "¿Cuántas solicitudes por minuto admite la API v3 por API key y qué respuesta recibo si me paso del límite?",
+    "expected_answer": "600 solicitudes por minuto por API key (con ráfagas de hasta 20 por segundo). Al superarlo la API responde HTTP 429 con el código rate_limited y la cabecera Retry-After con los segundos a esperar.",
+    "key_facts": [
+      "600",
+      "429",
+      "Retry-After"
+    ],
+    "type": "factoid",
+    "retrieval_hint": "hybrid",
+    "difficulty": "easy",
+    "relevant_docs": [
+      "NE-210"
+    ],
+    "relevant_files": [
+      "NE-210_Referencia_API_REST_v3.pdf"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-210",
+        "text": "Cada API key tiene un límite de 600 solicitudes por minuto, con ráfagas de hasta 20 solicitudes por segundo."
+      },
+      {
+        "doc": "NE-210",
+        "text": "la API responde 429 con el código rate_limited e incluye la cabecera Retry-After con los segundos que se deben esperar"
+      }
+    ]
+  },
+  {
+    "id": "G04",
+    "question": "¿Cómo obtengo un token de acceso para la API v3 y cuánto dura?",
+    "expected_answer": "Con OAuth 2.0 client credentials: POST /v3/auth/token con grant_type=client_credentials, client_id y client_secret. El token dura 3600 segundos (1 hora), no se renueva solo y se envía como Authorization: Bearer <token>.",
+    "key_facts": [
+      "POST /v3/auth/token",
+      "client credentials",
+      "3600"
+    ],
+    "type": "procedure",
+    "retrieval_hint": "hybrid",
+    "difficulty": "easy",
+    "relevant_docs": [
+      "NE-210"
+    ],
+    "relevant_files": [
+      "NE-210_Referencia_API_REST_v3.pdf"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-210",
+        "text": "El cliente obtiene un token de acceso en POST /v3/auth/token"
+      },
+      {
+        "doc": "NE-210",
+        "text": "Los tokens tienen una vigencia de 3600 segundos (1 hora)"
+      }
+    ]
+  },
+  {
+    "id": "G05",
+    "question": "¿Cuál es el rango de fechas máximo por consulta de telemetría histórica y cuántos puntos devuelve como máximo?",
+    "expected_answer": "31 días por solicitud y hasta 10 000 puntos; si el resultado es mayor, la respuesta incluye next_cursor.",
+    "key_facts": [
+      "31 días",
+      "10 000"
+    ],
+    "type": "numeric",
+    "retrieval_hint": "hybrid",
+    "difficulty": "medium",
+    "relevant_docs": [
+      "NE-210"
+    ],
+    "relevant_files": [
+      "NE-210_Referencia_API_REST_v3.pdf"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-210",
+        "text": "Cada solicitud admite un rango máximo de 31 días y devuelve hasta 10 000 puntos"
+      }
+    ]
+  },
+  {
+    "id": "G06",
+    "question": "¿Qué significa el código NE-E1042 y qué parámetro está relacionado?",
+    "expected_answer": "Buffer de telemetría lleno (advertencia): el buffer local en la eMMC alcanzó el límite telemetry.buffer_max_mb (256 MB por defecto) y se aplica la política telemetry.buffer_policy.",
+    "key_facts": [
+      "buffer",
+      "telemetry.buffer_max_mb",
+      "256"
+    ],
+    "type": "factoid",
+    "retrieval_hint": "lexical",
+    "difficulty": "easy",
+    "relevant_docs": [
+      "NE-300"
+    ],
+    "relevant_files": [
+      "NE-300_Catalogo_Codigos_Error.pdf"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-300",
+        "text": "El buffer local en la eMMC alcanzó el límite telemetry.buffer_max_mb (por defecto 256 MB) y se están aplicando las reglas de telemetry.buffer_policy."
+      }
+    ]
+  },
+  {
+    "id": "G07",
+    "question": "¿A qué temperatura el procesador empieza a reducir su frecuencia por calor y a cuál se apaga el equipo?",
+    "expected_answer": "Reduce la frecuencia (throttling) al superar los 85 °C, con el código NE-E2015, y se apaga para protegerse al llegar a 95 °C.",
+    "key_facts": [
+      "85 °C",
+      "95 °C"
+    ],
+    "type": "numeric",
+    "retrieval_hint": "semantic",
+    "difficulty": "medium",
+    "relevant_docs": [
+      "NE-300",
+      "NE-310"
+    ],
+    "relevant_files": [
+      "NE-300_Catalogo_Codigos_Error.pdf",
+      "NE-310_Manual_Mantenimiento_Troubleshooting.docx"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-300",
+        "text": "La temperatura del procesador superó los 85 °C, momento en que el equipo reduce la frecuencia (throttling)."
+      },
+      {
+        "doc": "NE-300",
+        "text": "Si llega a 95 °C, el equipo se apaga para protegerse."
+      },
+      {
+        "doc": "NE-310",
+        "text": "Por encima de 85 °C el procesador reduce su frecuencia (NE-E2015)."
+      }
+    ]
+  },
+  {
+    "id": "G08",
+    "question": "Después de una actualización de firmware el equipo volvió solo a la versión anterior. ¿Qué código registra y por qué ocurre?",
+    "expected_answer": "Registra NE-E3011 (advertencia): la actualización no superó la verificación posterior de 300 segundos, por lo que el sistema volvió automáticamente a la partición anterior (rollback automático).",
+    "key_facts": [
+      "NE-E3011",
+      "300 segundos"
+    ],
+    "type": "factoid",
+    "retrieval_hint": "hybrid",
+    "difficulty": "medium",
+    "relevant_docs": [
+      "NE-300",
+      "NE-410"
+    ],
+    "relevant_files": [
+      "NE-300_Catalogo_Codigos_Error.pdf",
+      "NE-410_Procedimiento_Actualizacion_Firmware.docx"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-300",
+        "text": "La actualización de firmware no superó la verificación posterior de 300 segundos y el equipo volvió a la partición anterior."
+      },
+      {
+        "doc": "NE-410",
+        "text": "el sistema vuelve automáticamente a la partición anterior y registra el código NE-E3011"
+      }
+    ]
+  },
+  {
+    "id": "G09",
+    "question": "¿Qué puertos de salida tengo que abrir en el firewall del cliente para que el gateway hable con la nube?",
+    "expected_answer": "Solo salida: TCP 8883 (MQTT sobre TLS) y 443 (API y descargas de firmware). No hacen falta puertos de entrada porque el gateway inicia las conexiones.",
+    "key_facts": [
+      "8883",
+      "443"
+    ],
+    "type": "list",
+    "retrieval_hint": "hybrid",
+    "difficulty": "medium",
+    "relevant_docs": [
+      "NE-500"
+    ],
+    "relevant_files": [
+      "NE-500_Whitepaper_Arquitectura_Seguridad.pdf"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-500",
+        "text": "solo se requiere salida al puerto TCP 8883 (MQTT sobre TLS) y al puerto 443 (API y descargas de firmware)"
+      }
+    ]
+  },
+  {
+    "id": "G10",
+    "question": "¿Qué mecanismo evita que alguien modifique el sistema operativo del gateway sin que se note al arrancar?",
+    "expected_answer": "Una cadena de arranque seguro: la ROM verifica el cargador de arranque, este verifica el kernel y el kernel verifica el sistema de archivos raíz mediante dm-verity. Además, el firmware se distribuye firmado con Ed25519.",
+    "key_facts": [
+      "dm-verity",
+      "ROM"
+    ],
+    "type": "explanation",
+    "retrieval_hint": "semantic",
+    "difficulty": "medium",
+    "relevant_docs": [
+      "NE-500"
+    ],
+    "relevant_files": [
+      "NE-500_Whitepaper_Arquitectura_Seguridad.pdf"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-500",
+        "text": "la ROM verifica el cargador de arranque, el cargador verifica el kernel y el kernel verifica el sistema de archivos raíz mediante dm-verity"
+      }
+    ]
+  },
+  {
+    "id": "G11",
+    "question": "¿Cada cuántos días rota el certificado del dispositivo y qué parámetro lo controla?",
+    "expected_answer": "Cada 90 días por defecto, controlado por security.cert_rotation_days (configurable entre 30 y 365).",
+    "key_facts": [
+      "90",
+      "security.cert_rotation_days"
+    ],
+    "type": "factoid",
+    "retrieval_hint": "hybrid",
+    "difficulty": "easy",
+    "relevant_docs": [
+      "NE-500",
+      "NE-220"
+    ],
+    "relevant_files": [
+      "NE-500_Whitepaper_Arquitectura_Seguridad.pdf",
+      "NE-220_Guia_Configuracion_Parametros.docx"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-500",
+        "text": "Los certificados de dispositivo se rotan automáticamente cada 90 días (parámetro security.cert_rotation_days, configurable entre 30 y 365)."
+      },
+      {
+        "doc": "NE-220",
+        "text": "Frecuencia de rotación del certificado del dispositivo."
+      }
+    ]
+  },
+  {
+    "id": "G12",
+    "question": "¿Cuál es el valor por defecto de mqtt.keepalive_interval y qué rango acepta?",
+    "expected_answer": "30 segundos por defecto (desde NimbusOS 4.2.0) y acepta valores de 10 a 300.",
+    "key_facts": [
+      "30",
+      "10 a 300"
+    ],
+    "type": "factoid",
+    "retrieval_hint": "lexical",
+    "difficulty": "easy",
+    "relevant_docs": [
+      "NE-220"
+    ],
+    "relevant_files": [
+      "NE-220_Guia_Configuracion_Parametros.docx"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-220",
+        "text": "Intervalo de keepalive con el broker. Era 60 en NimbusOS 4.0 y 4.1."
+      },
+      {
+        "doc": "NE-220",
+        "text": "10 a 300"
+      }
+    ]
+  },
+  {
+    "id": "G13",
+    "question": "En NimbusOS 4.1, ¿cuál era el keepalive MQTT por defecto?",
+    "expected_answer": "60 segundos. La versión 4.2.0 lo cambió a 30 segundos; los equipos con un valor configurado explícitamente no se modifican.",
+    "key_facts": [
+      "60",
+      "4.2.0"
+    ],
+    "type": "temporal",
+    "retrieval_hint": "hybrid",
+    "difficulty": "medium",
+    "relevant_docs": [
+      "NE-220",
+      "NE-420"
+    ],
+    "relevant_files": [
+      "NE-220_Guia_Configuracion_Parametros.docx",
+      "NE-420_Notas_de_Version_NimbusOS_4x.docx"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-220",
+        "text": "Intervalo de keepalive con el broker. Era 60 en NimbusOS 4.0 y 4.1."
+      },
+      {
+        "doc": "NE-420",
+        "text": "El valor por defecto de mqtt.keepalive_interval cambia de 60 a 30 segundos"
+      }
+    ]
+  },
+  {
+    "id": "G14",
+    "question": "En un sitio con cortes de red frecuentes un gateway empezó a registrar NE-E1042. ¿Qué indica y qué ajustes recomienda la documentación para ese escenario?",
+    "expected_answer": "NE-E1042 indica que el buffer de telemetría se llenó y se están descartando datos según la política configurada. Para sitios con cortes frecuentes se sugiere telemetry.buffer_max_mb en 512 y telemetry.buffer_policy en drop_oldest; también se puede reducir el volumen subiendo sample_interval_ms o batch_size.",
+    "key_facts": [
+      "NE-E1042",
+      "512",
+      "drop_oldest"
+    ],
+    "type": "multi_hop",
+    "retrieval_hint": "hybrid",
+    "difficulty": "hard",
+    "relevant_docs": [
+      "NE-300",
+      "NE-220"
+    ],
+    "relevant_files": [
+      "NE-300_Catalogo_Codigos_Error.pdf",
+      "NE-220_Guia_Configuracion_Parametros.docx"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-300",
+        "text": "El buffer local en la eMMC alcanzó el límite telemetry.buffer_max_mb (por defecto 256 MB) y se están aplicando las reglas de telemetry.buffer_policy."
+      },
+      {
+        "doc": "NE-220",
+        "text": "Sitio con cortes frecuentes de red"
+      },
+      {
+        "doc": "NE-220",
+        "text": "telemetry.buffer_max_mb 512, telemetry.buffer_policy drop_oldest"
+      }
+    ]
+  },
+  {
+    "id": "G15",
+    "question": "Si el archivo local de configuración y la nube definen valores distintos para el mismo parámetro, ¿cuál se aplica?",
+    "expected_answer": "Prevalece la configuración remota de Nimbus Cloud (comando sync_config o PUT /v3/devices/{device_id}/config), salvo las claves marcadas como local_only, que solo se modifican localmente.",
+    "key_facts": [
+      "remota",
+      "local_only"
+    ],
+    "type": "explanation",
+    "retrieval_hint": "semantic",
+    "difficulty": "medium",
+    "relevant_docs": [
+      "NE-220"
+    ],
+    "relevant_files": [
+      "NE-220_Guia_Configuracion_Parametros.docx"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-220",
+        "text": "La configuración remota enviada desde Nimbus Cloud (comando sync_config o PUT /v3/devices/{device_id}/config) tiene prioridad sobre el archivo local, salvo para las claves marcadas como local_only en este documento, que solo pueden modificarse localmente."
+      }
+    ]
+  },
+  {
+    "id": "G16",
+    "question": "¿Qué requisitos debo cumplir antes de actualizar el firmware de un gateway?",
+    "expected_answer": "Tener instalada la versión 4.0.3 o superior; al menos 500 MB libres en la eMMC; alimentación estable durante todo el proceso; conviene exportar la configuración (nbctl config export) y tener conectividad con la nube por el puerto 443, salvo que se use instalación local.",
+    "key_facts": [
+      "4.0.3",
+      "500 MB"
+    ],
+    "type": "list",
+    "retrieval_hint": "semantic",
+    "difficulty": "medium",
+    "relevant_docs": [
+      "NE-410"
+    ],
+    "relevant_files": [
+      "NE-410_Procedimiento_Actualizacion_Firmware.docx"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-410",
+        "text": "El equipo debe tener instalada la versión 4.0.3 o superior."
+      },
+      {
+        "doc": "NE-410",
+        "text": "Debe haber al menos 500 MB de espacio libre en la eMMC."
+      }
+    ]
+  },
+  {
+    "id": "G17",
+    "question": "Tengo equipos con NimbusOS 3.x y quiero llevarlos a 4.2.x. ¿Puedo actualizar directo?",
+    "expected_answer": "No. Primero hay que actualizar a 4.0.3 como paso intermedio y recién después a 4.2.x.",
+    "key_facts": [
+      "4.0.3",
+      "intermedio"
+    ],
+    "type": "table_lookup",
+    "retrieval_hint": "hybrid",
+    "difficulty": "medium",
+    "relevant_docs": [
+      "NE-410",
+      "NE-420"
+    ],
+    "relevant_files": [
+      "NE-410_Procedimiento_Actualizacion_Firmware.docx",
+      "NE-420_Notas_de_Version_NimbusOS_4x.docx"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-410",
+        "text": "Actualizar primero a 4.0.3 y luego a 4.2.x"
+      },
+      {
+        "doc": "NE-420",
+        "text": "Esta versión es la base obligatoria para actualizar desde NimbusOS 3.x."
+      }
+    ]
+  },
+  {
+    "id": "G18",
+    "question": "¿Cómo se comporta por defecto una campaña de firmware por oleadas?",
+    "expected_answer": "Actualiza el 10 % de la flota en cada oleada (batch_percent), espera 30 minutos entre oleadas (pause_minutes) y se aborta si el porcentaje de fallos supera el 5 % (abort_failure_rate).",
+    "key_facts": [
+      "batch_percent",
+      "10",
+      "30",
+      "5"
+    ],
+    "type": "numeric",
+    "retrieval_hint": "hybrid",
+    "difficulty": "medium",
+    "relevant_docs": [
+      "NE-410",
+      "NE-210"
+    ],
+    "relevant_files": [
+      "NE-410_Procedimiento_Actualizacion_Firmware.docx",
+      "NE-210_Referencia_API_REST_v3.pdf"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-410",
+        "text": "Porcentaje de la flota actualizado en cada oleada"
+      },
+      {
+        "doc": "NE-210",
+        "text": "batch_percent (por defecto 10), pause_minutes (por defecto 30) y abort_failure_rate (por defecto 5)"
+      }
+    ]
+  },
+  {
+    "id": "G19",
+    "question": "Instalé una versión nueva y se comporta mal. ¿Cómo vuelvo a la anterior y hasta cuándo puedo hacerlo?",
+    "expected_answer": "Con el comando nbctl ota rollback, que cambia la partición activa y reinicia el equipo. Solo es posible hasta la siguiente actualización, mientras la partición anterior conserve la versión previa; no revierte cambios de configuración.",
+    "key_facts": [
+      "nbctl ota rollback",
+      "siguiente actualización"
+    ],
+    "type": "procedure",
+    "retrieval_hint": "semantic",
+    "difficulty": "medium",
+    "relevant_docs": [
+      "NE-410"
+    ],
+    "relevant_files": [
+      "NE-410_Procedimiento_Actualizacion_Firmware.docx"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-410",
+        "text": "puede volverse a la versión anterior con el comando nbctl ota rollback"
+      },
+      {
+        "doc": "NE-410",
+        "text": "El rollback manual solo es posible mientras la partición anterior conserve la versión previa, es decir, hasta la siguiente actualización."
+      }
+    ]
+  },
+  {
+    "id": "G20",
+    "question": "¿En cuánto tiempo responde soporte a un incidente S1 en cada plan?",
+    "expected_answer": "Plan Premium: 30 minutos (con objetivo de restauración de 4 horas). Plan Standard: 4 horas hábiles.",
+    "key_facts": [
+      "30 minutos",
+      "4 horas hábiles"
+    ],
+    "type": "table_lookup",
+    "retrieval_hint": "hybrid",
+    "difficulty": "medium",
+    "relevant_docs": [
+      "NE-600"
+    ],
+    "relevant_files": [
+      "NE-600_Politica_Soporte_SLA.docx"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-600",
+        "text": "En el plan Standard, los plazos se cuentan en horas hábiles."
+      },
+      {
+        "doc": "NE-600",
+        "text": "4 horas hábiles"
+      },
+      {
+        "doc": "NE-600",
+        "text": "30 minutos"
+      }
+    ]
+  },
+  {
+    "id": "G21",
+    "question": "Si la disponibilidad mensual medida de la plataforma fue de 97 %, ¿qué crédito de servicio corresponde y hasta cuándo se puede pedir?",
+    "expected_answer": "Corresponde un crédito del 25 % de la cuota mensual (tramo menor a 99,0 % y mayor o igual a 95,0 %). Debe solicitarse dentro de los 30 días posteriores al cierre del mes afectado, abriendo un caso en el portal.",
+    "key_facts": [
+      "25 %",
+      "30 días"
+    ],
+    "type": "table_lookup",
+    "retrieval_hint": "semantic",
+    "difficulty": "hard",
+    "relevant_docs": [
+      "NE-600"
+    ],
+    "relevant_files": [
+      "NE-600_Politica_Soporte_SLA.docx"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-600",
+        "text": "Menor a 99,0 % y mayor o igual a 95,0 %"
+      },
+      {
+        "doc": "NE-600",
+        "text": "Los créditos deben solicitarse dentro de los 30 días posteriores al cierre del mes afectado, abriendo un caso en el portal."
+      }
+    ]
+  },
+  {
+    "id": "G22",
+    "question": "Un cliente con plan Standard abre un caso S2 por un dispositivo con NE-E2003 persistente. ¿En cuánto tiempo debe recibir respuesta y qué información debería incluir en el caso?",
+    "expected_answer": "Debe recibir respuesta en 8 horas hábiles (S2 en plan Standard). El caso debe incluir el device_id y el modelo, la versión de firmware, el código de error (NE-E2003), el resultado de nbctl diag --full y la franja horaria del incidente en UTC con los pasos para reproducirlo.",
+    "key_facts": [
+      "8 horas hábiles",
+      "device_id",
+      "nbctl diag --full"
+    ],
+    "type": "multi_hop",
+    "retrieval_hint": "hybrid",
+    "difficulty": "hard",
+    "relevant_docs": [
+      "NE-600",
+      "NE-310"
+    ],
+    "relevant_files": [
+      "NE-600_Politica_Soporte_SLA.docx",
+      "NE-310_Manual_Mantenimiento_Troubleshooting.docx"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-600",
+        "text": "8 horas hábiles"
+      },
+      {
+        "doc": "NE-600",
+        "text": "El device_id y el modelo (GX-200 o GX-200L)."
+      },
+      {
+        "doc": "NE-600",
+        "text": "El resultado del comando nbctl diag --full."
+      },
+      {
+        "doc": "NE-310",
+        "text": "Antes de abrir un caso de soporte, genere un paquete de diagnóstico con nbctl diag --full."
+      }
+    ]
+  },
+  {
+    "id": "G23",
+    "question": "¿Cada cuánto hay que cambiar la batería del reloj RTC y qué pila usa?",
+    "expected_answer": "Cada 5 años; es una pila CR2032 (repuesto NE-ACC-BAT32).",
+    "key_facts": [
+      "5 años",
+      "CR2032"
+    ],
+    "type": "factoid",
+    "retrieval_hint": "lexical",
+    "difficulty": "easy",
+    "relevant_docs": [
+      "NE-310"
+    ],
+    "relevant_files": [
+      "NE-310_Manual_Mantenimiento_Troubleshooting.docx"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-310",
+        "text": "Reemplazo de batería del reloj RTC"
+      },
+      {
+        "doc": "NE-310",
+        "text": "Cada 5 años"
+      },
+      {
+        "doc": "NE-310",
+        "text": "Pila CR2032, repuesto NE-ACC-BAT32"
+      }
+    ]
+  },
+  {
+    "id": "G24",
+    "question": "¿Qué comando genera el paquete de diagnóstico y dónde queda guardado el archivo?",
+    "expected_answer": "nbctl diag --full. Crea /var/tmp/nimbus-diag-<AAAAMMDD-HHMMSS>.tar.gz con la configuración (sin contraseñas ni claves), los últimos registros, el estado de red y la lista de códigos activos.",
+    "key_facts": [
+      "nbctl diag --full",
+      "/var/tmp/nimbus-diag-"
+    ],
+    "type": "factoid",
+    "retrieval_hint": "lexical",
+    "difficulty": "easy",
+    "relevant_docs": [
+      "NE-310"
+    ],
+    "relevant_files": [
+      "NE-310_Manual_Mantenimiento_Troubleshooting.docx"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-310",
+        "text": "Antes de abrir un caso de soporte, genere un paquete de diagnóstico con nbctl diag --full."
+      },
+      {
+        "doc": "NE-310",
+        "text": "El comando crea un archivo /var/tmp/nimbus-diag-<AAAAMMDD-HHMMSS>.tar.gz"
+      }
+    ]
+  },
+  {
+    "id": "G25",
+    "question": "¿Qué problemas corrige NimbusOS 4.2.1?",
+    "expected_answer": "Corrige reinicios espurios por watchdog (NE-E2007) con modbus.poll_interval_ms menor a 200 y más de 64 registros Modbus; una fuga de memoria de unos 2 MB por hora en el agrupador de telemetría; y un mensaje incorrecto de nbctl ota status tras un rollback.",
+    "key_facts": [
+      "NE-E2007",
+      "fuga de memoria",
+      "64 registros"
+    ],
+    "type": "list",
+    "retrieval_hint": "hybrid",
+    "difficulty": "medium",
+    "relevant_docs": [
+      "NE-420"
+    ],
+    "relevant_files": [
+      "NE-420_Notas_de_Version_NimbusOS_4x.docx"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-420",
+        "text": "Se corrigió un reinicio espurio por watchdog (NE-E2007) que podía ocurrir cuando modbus.poll_interval_ms era menor a 200 y había más de 64 registros Modbus configurados."
+      },
+      {
+        "doc": "NE-420",
+        "text": "Se corrigió una fuga de memoria en el agrupador de telemetría que consumía aproximadamente 2 MB por hora"
+      }
+    ]
+  },
+  {
+    "id": "G26",
+    "question": "¿Hasta cuándo puedo seguir usando la API REST v2?",
+    "expected_answer": "Hasta el 31 de diciembre de 2026; después deja de funcionar y hay que migrar a la API v3.",
+    "key_facts": [
+      "31 de diciembre de 2026",
+      "v3"
+    ],
+    "type": "temporal",
+    "retrieval_hint": "hybrid",
+    "difficulty": "easy",
+    "relevant_docs": [
+      "NE-210",
+      "NE-420",
+      "NE-600"
+    ],
+    "relevant_files": [
+      "NE-210_Referencia_API_REST_v3.pdf",
+      "NE-420_Notas_de_Version_NimbusOS_4x.docx",
+      "NE-600_Politica_Soporte_SLA.docx"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-210",
+        "text": "La API v2 está obsoleta y dejará de funcionar el 31 de diciembre de 2026."
+      },
+      {
+        "doc": "NE-420",
+        "text": "Fin de soporte: 31 de diciembre de 2026"
+      },
+      {
+        "doc": "NE-600",
+        "text": "La API REST v2 deja de estar disponible el 31 de diciembre de 2026."
+      }
+    ]
+  },
+  {
+    "id": "G27",
+    "question": "¿Cuántos dispositivos puedo conectar a un bus RS-485 sin repetidores y qué longitud máxima tiene a 9600 baudios?",
+    "expected_answer": "Hasta 32 dispositivos por bus sin repetidores y una longitud máxima de 1200 m a 9600 baudios, con resistencias de terminación de 120 ohmios en los dos extremos.",
+    "key_facts": [
+      "32",
+      "1200 m"
+    ],
+    "type": "numeric",
+    "retrieval_hint": "hybrid",
+    "difficulty": "easy",
+    "relevant_docs": [
+      "NE-510",
+      "NE-310"
+    ],
+    "relevant_files": [
+      "NE-510_Guia_Integracion_MQTT_Modbus.docx",
+      "NE-310_Manual_Mantenimiento_Troubleshooting.docx"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-510",
+        "text": "Máximo de 32 dispositivos por bus sin repetidores."
+      },
+      {
+        "doc": "NE-510",
+        "text": "Longitud máxima de 1200 m a 9600 baudios; a velocidades mayores la distancia útil disminuye."
+      },
+      {
+        "doc": "NE-310",
+        "text": "Longitud del bus: el máximo es de 1200 m a 9600 baudios y 32 dispositivos sin repetidores."
+      }
+    ]
+  },
+  {
+    "id": "G28",
+    "question": "¿Qué garantía de entrega tiene por defecto la publicación de telemetría y qué debe hacer el consumidor para no procesar datos repetidos?",
+    "expected_answer": "Usa QoS 1 (entrega al menos una vez), por lo que pueden llegar duplicados: el consumidor debe deduplicar por batch_id (y ordenar por ts).",
+    "key_facts": [
+      "QoS 1",
+      "batch_id"
+    ],
+    "type": "explanation",
+    "retrieval_hint": "semantic",
+    "difficulty": "medium",
+    "relevant_docs": [
+      "NE-510",
+      "NE-500"
+    ],
+    "relevant_files": [
+      "NE-510_Guia_Integracion_MQTT_Modbus.docx",
+      "NE-500_Whitepaper_Arquitectura_Seguridad.pdf"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-510",
+        "text": "Por defecto la telemetría se publica con QoS 1 (entrega al menos una vez), por lo que el consumidor debe deduplicar por batch_id."
+      },
+      {
+        "doc": "NE-500",
+        "text": "Los lotes se publican por MQTT con calidad de servicio QoS 1, lo que garantiza entrega al menos una vez."
+      }
+    ]
+  },
+  {
+    "id": "G29",
+    "question": "Un gateway con NimbusOS 4.2.0 se reinicia solo y el registro muestra NE-E2007. ¿Cuál es la causa probable y cómo lo soluciono?",
+    "expected_answer": "NE-E2007 es un reinicio por watchdog: nimbusd dejó de responder durante watchdog.timeout_s (60 s por defecto). Antes de la 4.2.1 ocurre con modbus.poll_interval_ms menor a 200 y más de 64 registros configurados. Solución: actualizar a 4.2.1 o superior, o subir modbus.poll_interval_ms a 200 ms o más; además revisar la alimentación (caídas por debajo de 9 V) y recolectar un diagnóstico con nbctl diag --full.",
+    "key_facts": [
+      "watchdog",
+      "4.2.1",
+      "200"
+    ],
+    "type": "multi_hop",
+    "retrieval_hint": "hybrid",
+    "difficulty": "hard",
+    "relevant_docs": [
+      "NE-300",
+      "NE-310",
+      "NE-420"
+    ],
+    "relevant_files": [
+      "NE-300_Catalogo_Codigos_Error.pdf",
+      "NE-310_Manual_Mantenimiento_Troubleshooting.docx",
+      "NE-420_Notas_de_Version_NimbusOS_4x.docx"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-300",
+        "text": "en versiones anteriores a 4.2.1, un sondeo Modbus con modbus.poll_interval_ms menor a 200 y más de 64 registros configurados podía saturar el proceso"
+      },
+      {
+        "doc": "NE-310",
+        "text": "Actualice a 4.2.1 o aumente el intervalo a 200 ms o más."
+      },
+      {
+        "doc": "NE-420",
+        "text": "Se corrigió un reinicio espurio por watchdog (NE-E2007)"
+      }
+    ]
+  },
+  {
+    "id": "G30",
+    "question": "Estoy en NimbusOS 4.1.0 y quiero pasar a 4.2.1. ¿Puedo ir directo y qué cambia con el keepalive MQTT?",
+    "expected_answer": "Sí, la actualización es directa porque el origen es 4.0.3 o superior. Desde la 4.2.0 el keepalive por defecto pasa de 60 a 30 segundos, pero los equipos con mqtt.keepalive_interval configurado explícitamente no se modifican.",
+    "key_facts": [
+      "4.0.3 o superior",
+      "60",
+      "30"
+    ],
+    "type": "multi_hop",
+    "retrieval_hint": "hybrid",
+    "difficulty": "hard",
+    "relevant_docs": [
+      "NE-410",
+      "NE-420",
+      "NE-220"
+    ],
+    "relevant_files": [
+      "NE-410_Procedimiento_Actualizacion_Firmware.docx",
+      "NE-420_Notas_de_Version_NimbusOS_4x.docx",
+      "NE-220_Guia_Configuracion_Parametros.docx"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-410",
+        "text": "4.0.3 o superior"
+      },
+      {
+        "doc": "NE-410",
+        "text": "Actualización directa"
+      },
+      {
+        "doc": "NE-420",
+        "text": "Los equipos con configuración explícita no se modifican."
+      }
+    ]
+  }
+]

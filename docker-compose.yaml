@@ -1,0 +1,11 @@
+services:
+  app:
+    build: .
+    image: delivery4:latest
+    env_file:
+      - .env
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./vectorstore:/app/vectorstore
+    command: ["python", "main.py"]

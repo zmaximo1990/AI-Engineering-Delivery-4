@@ -1,0 +1,60 @@
+sequenceDiagram
+    actor User
+    participant Main
+    participant Chain as get_rag_response
+    participant LLM as LLMFactory
+    participant Retriever
+    participant Ingestor
+    participant BM25
+    participant VectorStoreManager
+    participant VectorStore
+    participant Ensemble as EnsembleRetriever
+    participant Embeddings
+    participant Index
+    participant LLM
+
+    User->>Main: question
+    Main->>Chain: ask calls get_rag_response
+    Chain->>Chain: strip whitespace and reject an empty question
+    Chain->>LLM: create_client(config)
+    LLM-->>Chain: provider client
+    Chain->>Retriever: Retriever()
+    Retriever->>Ingestor: load_documents()
+    Note over Ingestor: reads and chunks data/ again, without writing the index
+    Ingestor-->>Retriever: documents
+    Retriever->>BM25: from_documents, k=5
+    Retriever->>VectorStoreManager: get_vector_store()
+    VectorStoreManager-->>Retriever: Store
+    Retriever->>VectorStore: as_retriever(k=5, similarity)
+    VectorStore-->>Retriever: VectorStoreRetriever
+    Retriever->>Ensemble: BM25 and vector retrievers, weights 0.5/0.5
+
+    Chain->>Chain: ainvoke with the question
+    Chain->>Retriever: ainvoke
+    Retriever->>Ensemble: ainvoke
+    par lexical and vector
+        Ensemble->>BM25: ainvoke
+        BM25-->>Ensemble: lexical ranking
+    and
+        Ensemble->>VectorStore: ainvoke
+        VectorStore->>Embeddings: embed the question
+        Embeddings-->>VectorStore: vector
+        VectorStore->>Index: similarity_search
+        Index-->>VectorStore: neighbors
+        VectorStore-->>Ensemble: vector ranking
+    end
+    Ensemble->>Ensemble: Reciprocal Rank Fusion
+    Ensemble-->>Retriever: fused documents
+    Retriever-->>Chain: at most 5
+
+    Chain->>Chain: format_documents builds the context
+    Chain->>LLM: prompt plus structured LLMAnswer output
+
+    alt empty, invalid, or truncated output
+        Chain->>LLM: retries up to RETRY_ATTEMPTS
+    end
+
+    LLM-->>Chain: answer
+    Chain->>Chain: assemble_response reads sources from metadata
+    Chain-->>Main: RAGResponse
+    Main-->>User: answer, sources, and fragment count

@@ -1,0 +1,119 @@
+# Load env before the modules that read it at import time.
+from pathlib import Path
+
+from ingestion import Ingestor, ingest_if_needed
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).resolve().with_name(".env"))
+
+import argparse
+import asyncio
+import logging
+
+from chain import get_rag_response
+from samples import DEMO_QUESTIONS
+from schemas import LLMConfig, Provider, RAGResponse
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
+logger = logging.getLogger(__name__)
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Ask a question against the local TechCorp policy index."
+    )
+    parser.add_argument(
+        "-p",
+        "--provider",
+        default=Provider.OPENAI.value,
+        choices=[provider.value for provider in Provider],
+        help="LLM provider used to build LLMConfig (default: openai)",
+    )
+    parser.add_argument(
+        "-q",
+        "--question",
+        default=None,
+        help="Ask one question and exit. If omitted, prompt for questions.",
+    )
+    parser.add_argument(
+        "--demo",
+        action="store_true",
+        help="Run the grounded question and the trap question, then exit.",
+    )
+    args = parser.parse_args()
+    if args.demo and args.question:
+        parser.error("use either --demo or --question, not both")
+    return args
+
+def prepare_index() -> int:
+    """Open the local store and index ``data/`` when the collection is empty.
+
+    Called before the prompt so the embedding model is loaded once, up front.
+    """
+    logger.info("Preparing index")
+    Ingestor().ingest_if_needed()
+
+def print_response(result: RAGResponse) -> None:
+    print(f"Answer: {result.answer}", flush=True)
+    if result.sources:
+        print("Sources: " + ", ".join(result.sources), flush=True)
+    else:
+        print("Sources: (none)", flush=True)
+    print(f"Retrieved fragments: {result.retrieved_fragments}", flush=True)
+
+
+async def ask(config: LLMConfig, question: str) -> None:
+    if not question or not question.strip():
+        logger.error("Question is empty")
+        return
+    result = await get_rag_response(question, config)
+    print_response(result)
+
+
+def read_question() -> str:
+    try:
+        return input("Question: ").strip()
+    except (EOFError, KeyboardInterrupt):
+        print()
+        return ""
+
+
+async def main(args: argparse.Namespace) -> None:
+    config = LLMConfig(provider=Provider(args.provider))
+    logger.info("LLMConfig initialized (provider=%s)", config.provider.value)
+    prepare_index()
+
+    if args.demo:
+        for label, question in DEMO_QUESTIONS:
+            print(f"\n--- {label} ---", flush=True)
+            print(f"Question: {question}", flush=True)
+            try:
+                await ask(config, question)
+            except Exception as exc:
+                logger.error("get_rag_response failed for %s: %s", label, exc)
+        logger.info("Finished")
+        return
+
+    if args.question:
+        await ask(config, args.question)
+        logger.info("Finished")
+        return
+
+    print("TechCorp policy assistant... ask away!\n\n", flush=True)
+    print("Type a question and press Enter. An empty line exits.", flush=True)
+    while True:
+        question = read_question()
+        if not question:
+            break
+        try:
+            await ask(config, question)
+        except Exception as exc:
+            logger.error("get_rag_response failed: %s", exc)
+    logger.info("Finished")
+
+
+if __name__ == "__main__":
+    asyncio.run(main(parse_args()))
