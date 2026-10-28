@@ -8,7 +8,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_openai import ChatOpenAI
 from pydantic import SecretStr
 
-from constants import DEFAULT_MAX_TOKENS, DEFAULT_TEMPERATURE
+from settings import settings
 from schemas import Provider
 
 logger = logging.getLogger(__name__)
@@ -24,8 +24,8 @@ class BaseLLMClient(ABC):
     def __init__(
         self,
         model: str | None = None,
-        max_tokens: int = DEFAULT_MAX_TOKENS,
-        temperature: float = DEFAULT_TEMPERATURE,
+        max_tokens: int = settings.default_max_tokens,
+        temperature: float = settings.default_temperature,
     ) -> None:
         self.model = model or self.default_model
         self.max_tokens = max_tokens

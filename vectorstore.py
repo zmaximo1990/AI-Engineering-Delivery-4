@@ -10,7 +10,7 @@ from typing import Any, cast
 
 import chromadb
 from chromadb.api.models import Collection as ChromaDBCollection
-from chromadb.config import Settings
+from chromadb.config import Settings as ChromaSettings
 from chromadb.errors import ChromaError
 from langchain_chroma import Chroma
 from langchain_core.vectorstores import VectorStore, VectorStoreRetriever
@@ -18,17 +18,7 @@ from langchain_pinecone import PineconeVectorStore
 from pinecone import Pinecone, ServerlessSpec
 from pinecone.exceptions import PineconeException, UnauthorizedException
 
-from constants import (
-    COLLECTION_NAME,
-    EMBEDDING_BATCH_SIZE,
-    EMBEDDING_DIMENSION,
-    INDEX_NAME,
-    NAMESPACE,
-    SCORE_THRESHOLD,
-    TOP_K,
-    VECTOR_STORE,
-    VECTORSTORE_DIR,
-)
+from settings import settings
 from embeddings import BaseEmbeddings
 from factory import EmbeddingsFactory
 
@@ -109,7 +99,7 @@ class VectorStoreManager(ABC):
         """Yield equal-sized slices for embedding and writing."""
         if not (len(ids) == len(documents) == len(metadatas)):
             raise ValueError("ids, documents, and metadatas must have the same length")
-        size = EMBEDDING_BATCH_SIZE
+        size = settings.embedding_batch_size
         for start in range(0, len(ids), size):
             end = start + size
             yield ids[start:end], documents[start:end], metadatas[start:end]
@@ -117,9 +107,9 @@ class VectorStoreManager(ABC):
     def _embedding_dimension(self) -> int:
         """Read the dimension from one embedding of the configured model."""
         current = len(self.embeddings.embed_query("dimension"))
-        if EMBEDDING_DIMENSION is not None and EMBEDDING_DIMENSION != current:
+        if settings.embedding_dimension is not None and settings.embedding_dimension != current:
             raise VectorStoreError(
-                f"EMBEDDING_DIMENSION is {EMBEDDING_DIMENSION}, "
+                f"EMBEDDING_DIMENSION is {settings.embedding_dimension}, "
                 f"but '{self.embedding_model_name}' returned vectors of length {current}."
             )
         return current
@@ -143,7 +133,7 @@ class VectorStoreManager(ABC):
     def semantic_search(
         self,
         query_text: str,
-        n_results: int = TOP_K,
+        n_results: int = settings.top_k,
         where: dict[str, Any] | None = None,
     ) -> list[dict[str, Any]]:
         """Return the nearest documents. Lower distance means a closer match."""
@@ -156,8 +146,8 @@ class VectorStoreManager(ABC):
 
     def as_retriever(
         self,
-        k: int = TOP_K,
-        score_threshold: float = SCORE_THRESHOLD,
+        k: int = settings.top_k,
+        score_threshold: float = settings.score_threshold,
         search_type: str = "similarity_score_threshold",
     ) -> VectorStoreRetriever:
         """Similarity retriever. ``k`` is clamped to the spec range of 3 to 5.
@@ -189,10 +179,10 @@ class ChromaStoreManager(VectorStoreManager):
     def __init__(
         self,
         persist_directory: Path | str | None = None,
-        collection_name: str = COLLECTION_NAME,
+        collection_name: str = settings.collection_name,
         embeddings: BaseEmbeddings | None = None,
     ) -> None:
-        persist_path = Path(persist_directory or VECTORSTORE_DIR)
+        persist_path = Path(persist_directory or settings.vectorstore_dir)
         if not persist_path.is_absolute():
             persist_path = Path(__file__).resolve().parent / persist_path
         self.persist_path = persist_path
@@ -213,7 +203,7 @@ class ChromaStoreManager(VectorStoreManager):
         self.persist_path.mkdir(parents=True, exist_ok=True)
         self.client = chromadb.PersistentClient(
             path=str(self.persist_path),
-            settings=Settings(anonymized_telemetry=False),
+            settings=ChromaSettings(anonymized_telemetry=False),
         )
         self.store =Chroma(
             client=self.client,
@@ -262,7 +252,7 @@ class ChromaStoreManager(VectorStoreManager):
     def semantic_search(
         self,
         query_text: str,
-        n_results: int = TOP_K,
+        n_results: int = settings.top_k,
         where: dict[str, Any] | None = None,
     ) -> list[dict[str, Any]]:
         """Return the nearest documents. Lower distance means a closer match."""
@@ -300,8 +290,8 @@ class PineconeStoreManager(VectorStoreManager):
         namespace: str | None = None,
         embeddings: BaseEmbeddings | None = None,
     ) -> None:
-        self.index_name = index_name or INDEX_NAME
-        self.namespace = namespace or NAMESPACE
+        self.index_name = index_name or settings.index_name
+        self.namespace = namespace or settings.namespace
         super().__init__(embeddings=embeddings)
         logger.info(
             "Pinecone index ready (index=%s, namespace=%s, dimension=%d, embedding=%s, documents=%d)",
@@ -418,7 +408,7 @@ class PineconeStoreManager(VectorStoreManager):
     def semantic_search(
         self,
         query_text: str,
-        n_results: int = TOP_K,
+        n_results: int = settings.top_k,
         where: dict[str, Any] | None = None,
     ) -> list[dict[str, Any]]:
         """Return the nearest documents for this namespace."""
@@ -456,9 +446,9 @@ def get_vector_store() -> VectorStoreManager:
     """Return the process-wide store so the embedding model is loaded once (singleton)."""
     global _manager
     if _manager is None:
-        if VECTOR_STORE == "pinecone":
+        if settings.vector_store == "pinecone":
             _manager = PineconeStoreManager()
-        elif VECTOR_STORE == "chroma":
+        elif settings.vector_store == "chroma":
             _manager = ChromaStoreManager()
         else:
             raise ValueError("VECTOR_STORE must be one of: pinecone, chroma")

@@ -1,6 +1,6 @@
 # Code Delivery for Module #4 | Scalable RAG with Pinecone
 
-Async Python pipeline that answers a question from a hybrid index. Files in `data/` (PDF, DOCX, Markdown, and plain text) are converted to Markdown, split into token-sized chunks, and embedded once. A LangChain LCEL chain fuses BM25 with vector similarity, asks the model to answer only from that context, and attaches the source filenames itself.
+Async Python pipeline that answers a question from a hybrid index. Files in `data/` (PDF, DOCX, Markdown, and plain text) are converted to Markdown, split into token-sized chunks, and embedded once. Extraction unifies every supported format to Markdown. When the format has pages, the file is segmented and consumed page by page first; a format without pages becomes a single segment. Each segment is a `DocumentPage`. Chunking runs on that Markdown page, not on the raw file. A LangChain LCEL chain fuses BM25 with vector similarity, asks the model to answer only from that context, and attaches the source filenames itself.
 
 `get_rag_response()` returns a `RAGResponse`:
 
@@ -84,8 +84,8 @@ Delete `vectorstore/` to reindex that collection.
 | `samples.py` | Grounded question and trap question |
 | `chain.py` | LCEL chain, `build_chain`, and `get_rag_response()` |
 | `prompts.py` | Grounded system prompt. Context and question are template variables |
-| `ingestion.py` | Lists `data/`, chunks each asset, and skips a populated index |
-| `extraction.py` | `AssetExtractor`: PDF, DOCX, Markdown, and plain text to `DocumentPage` |
+| `ingestion.py` | Lists `data/`, chunks each Markdown `DocumentPage`, and skips a populated index |
+| `extraction.py` | `AssetExtractor`: PDF, DOCX, Markdown, and plain text to Markdown `DocumentPage`s, page by page when the format has pages |
 | `processing.py` | `Chunkener`: clean text, then split at 500 tokens with 50 of overlap |
 | `retriever.py` | BM25 plus vector search, fused by `EnsembleRetriever` |
 | `vectorstore.py` | Pinecone and Chroma backends, upsert, and `as_retriever` |
@@ -93,7 +93,7 @@ Delete `vectorstore/` to reindex that collection.
 | `llm.py` | `OpenAIClient`, `AnthropicClient`, and `GeminiClient` |
 | `factory.py` | Builds a chat client or an embeddings client from config |
 | `schemas.py` | `LLMAnswer`, `RAGResponse`, `DocumentPage`, providers, and `LLMConfig` |
-| `constants.py` | Chunk size, `top_k`, Pinecone names, paths, retry settings |
+| `settings.py` | Proyect settings loaded from the environment (`.env` file) like chunk size, `top_k`, Pinecone names, paths, and retry settings, loaded from the environment through `Settings` |
 | `data/` | Nimbus engineering notes (PDF and DOCX) used as the corpus |
 | `tests/golden_set.json` | Questions whose expected source document is known |
 | `tests/unanswerable_set.json` | Questions the corpus does not answer |

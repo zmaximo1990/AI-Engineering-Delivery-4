@@ -9,7 +9,7 @@ from langchain_huggingface import HuggingFaceEmbeddings as HuggingFaceEmbeddingM
 from langchain_openai import OpenAIEmbeddings as OpenAIEmbeddingModel
 from pydantic import SecretStr
 
-from constants import HUGGINGFACE_EMBEDDING_MODEL, OPENAI_EMBEDDING_MODEL
+from settings import settings
 from schemas import EmbeddingsProvider
 
 logger = logging.getLogger(__name__)
@@ -43,7 +43,7 @@ class HuggingFaceEmbeddings(BaseEmbeddings):
     """Local sentence-transformers embeddings."""
 
     provider = EmbeddingsProvider.HUGGINGFACE
-    default_model = HUGGINGFACE_EMBEDDING_MODEL
+    default_model = settings.huggingface_embedding_model
 
     def _build(self) -> Embeddings:
         os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
@@ -56,7 +56,7 @@ class OpenAIEmbeddings(BaseEmbeddings):
     """OpenAI embeddings. Requires OPENAI_API_KEY."""
 
     provider = EmbeddingsProvider.OPENAI
-    default_model = OPENAI_EMBEDDING_MODEL
+    default_model = settings.openai_embedding_model
     api_key_env = "OPENAI_API_KEY"
 
     def _build(self) -> Embeddings:

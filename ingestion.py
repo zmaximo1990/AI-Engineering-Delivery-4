@@ -7,7 +7,7 @@ from pathlib import Path
 
 from langchain_core.documents import Document
 
-from constants import DATA_DIR
+from settings import settings
 from extraction import AssetExtractor
 from processing import Chunkener
 from vectorstore import VectorStoreManager, get_vector_store
@@ -21,7 +21,7 @@ class Ingestor:
     """Read the data directory, chunk each asset, and upsert the chunks."""
 
     def __init__(self, data_dir: Path | None = None, extractor: AssetExtractor | None = None, chunkener: Chunkener | None = None) -> None:
-        self.data_dir = data_dir or DATA_DIR
+        self.data_dir = data_dir or settings.data_dir
         self.extractor = extractor or AssetExtractor()
         self.chunkener = chunkener or Chunkener()
 

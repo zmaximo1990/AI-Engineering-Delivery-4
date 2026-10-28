@@ -8,7 +8,7 @@ from langchain_classic.retrievers import EnsembleRetriever
 from langchain_community.retrievers import BM25Retriever
 from langchain_core.documents import Document
 
-from constants import HYBRID_K
+from settings import settings
 from ingestion import Ingestor
 from vectorstore import get_vector_store
 
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 class Retriever:
     """Fuse lexical and vector search and return the top-k documents."""
 
-    def __init__(self, k: int = HYBRID_K) -> None:
+    def __init__(self, k: int = settings.hybrid_k) -> None:
         if isinstance(k, bool) or not isinstance(k, int) or k < 1:
             raise ValueError("k must be a positive integer.")
         self.k = k

@@ -5,7 +5,7 @@ import re
 import tiktoken
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from constants import CHUNK_OVERLAP, CHUNK_SIZE, MODEL_ENCODING
+from settings import settings
 
 # Repeated page headers from an extracted PDF.
 _PAGE_HEADER = re.compile(r"(?m)^.*Pág\.\s*\d+.*\n?")
@@ -20,9 +20,9 @@ class Chunkener:
 
     def __init__(
         self,
-        model_encoding: str = MODEL_ENCODING,
-        chunk_size: int = CHUNK_SIZE,
-        chunk_overlap: int = CHUNK_OVERLAP,
+        model_encoding: str = settings.model_encoding,
+        chunk_size: int = settings.chunk_size,
+        chunk_overlap: int = settings.chunk_overlap,
     ):
         if chunk_size < 1:
             raise ValueError("chunk_size must be at least 1")

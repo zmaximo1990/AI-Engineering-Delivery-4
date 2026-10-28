@@ -1,7 +1,7 @@
 import logging
 from typing import Optional
 
-from constants import EMBEDDING_PROVIDER, GEMINI_MAX_TOKENS
+from settings import settings
 from embeddings import BaseEmbeddings, HuggingFaceEmbeddings, OpenAIEmbeddings
 from llm import AnthropicClient, BaseLLMClient, GeminiClient, OpenAIClient
 from schemas import EmbeddingsProvider, LLMConfig, Provider
@@ -30,7 +30,7 @@ class LLMFactory:
             client = AnthropicClient(**kwargs)
         elif config.provider == Provider.GEMINI:
             # Gemini spends part of the budget on thinking tokens.
-            kwargs["max_tokens"] = max(config.max_tokens, GEMINI_MAX_TOKENS)
+            kwargs["max_tokens"] = max(config.max_tokens, settings.gemini_max_tokens)
             client = GeminiClient(**kwargs)
         else:
             raise ValueError(f"Invalid provider: {config.provider}")
@@ -75,7 +75,7 @@ class EmbeddingsFactory:
         """
 
         try:
-            return EmbeddingsProvider(EMBEDDING_PROVIDER)
+            return EmbeddingsProvider(settings.embedding_provider)
         except ValueError as exc:
             allowed = ", ".join(item.value for item in EmbeddingsProvider)
             raise ValueError(f"EMBEDDING_PROVIDER must be one of: {allowed}") from exc

@@ -10,7 +10,7 @@ from openai import LengthFinishReasonError
 from pydantic import ValidationError
 
 from llm import BaseLLMClient
-from constants import DEFAULT_PROVIDER, RETRY_ATTEMPTS, TRUNCATED_REASONS
+from settings import settings
 from factory import LLMFactory
 from prompts import prompt
 from retriever import Retriever
@@ -40,7 +40,7 @@ def _reject_incomplete(result: dict) -> LLMAnswer:
     reason = _finish_reason(raw)
     logger.info("Validating structured output (finish_reason=%s)", reason)
 
-    if reason in TRUNCATED_REASONS:
+    if reason in settings.truncated_reasons:
         logger.warning(
             "Model output truncated (finish_reason=%s); retrying",
             reason,
@@ -176,14 +176,14 @@ def build_chain(config: LLMConfig) -> Runnable:
             ValidationError,
             LengthFinishReasonError,
         ),
-        stop_after_attempt=RETRY_ATTEMPTS,
+        stop_after_attempt=settings.retry_attempts,
     )
     return compose_rag_chain(llm_generator)
 
 
 def _default_config() -> LLMConfig:
     try:
-        provider = Provider(DEFAULT_PROVIDER)
+        provider = Provider(settings.default_provider)
     except ValueError as exc:
         allowed = ", ".join(item.value for item in Provider)
         raise ValueError(f"LLM_PROVIDER must be one of: {allowed}") from exc
