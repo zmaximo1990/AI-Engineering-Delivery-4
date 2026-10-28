@@ -60,9 +60,9 @@ class Settings(BaseSettings):
 
     huggingface_embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
     openai_embedding_model: str = "text-embedding-3-small"
-    embedding_provider: str = "huggingface"
+    embedding_provider: str = "openai"
     embedding_batch_size: int = 100
-    embedding_dimension: int | None = None
+    embedding_dimension: int | None = 1536
     index_name: str = "delivery4-index"
     namespace: str = "delivery4"
     vector_store: str = "pinecone"

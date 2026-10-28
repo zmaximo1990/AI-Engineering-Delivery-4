@@ -50,7 +50,7 @@ The chain adds keys as it goes:
 
 The hybrid retriever builds a BM25 index in memory from the chunked corpus and a `VectorStoreRetriever` over the persisted embeddings. `EnsembleRetriever` fuses the two rankings with equal weights (0.5 / 0.5) using Reciprocal Rank Fusion.
 
-The default vector store is Pinecone Serverless (`aws` / `us-east-1`, cosine). Set `VECTOR_STORE=chroma` to use a local Chroma collection instead. Indexing and search share one embedding model. The default is `sentence-transformers/all-MiniLM-L6-v2` (384 dimensions). A Pinecone index created at another dimension is refused. A non-empty namespace is left as-is on the next run.
+The default vector store is Pinecone Serverless (`aws` / `us-east-1`, cosine). Set `VECTOR_STORE=chroma` to use a local Chroma collection instead. Indexing and search share one embedding model. The default is `text-embedding-3-small` (1536 dimensions). A Pinecone index created at another dimension is refused. A non-empty namespace is left as-is on the next run.
 
 The default chat provider is OpenAI (`gpt-4o-mini`). Pass `-p anthropic` or `-p gemini` to switch. Model names follow the Module 2 delivery (`claude-haiku-4-5-20251001`, `models/gemini-3.8-flash`). Gemini runs with at least `max_tokens=1024` so thinking tokens are less likely to truncate the object.
 
@@ -63,7 +63,7 @@ The default chat provider is OpenAI (`gpt-4o-mini`). Pass `-p anthropic` or `-p 
   - `ANTHROPIC_API_KEY` when `-p anthropic`
   - `GEMINI_API_KEY` when `-p gemini`
 
-The default embeddings run locally and do not use an API key. `EMBEDDING_PROVIDER=openai` uses `text-embedding-3-small` (1536 dimensions) and needs `OPENAI_API_KEY`.
+The default embeddings are OpenAI `text-embedding-3-small` (1536 dimensions) and need `OPENAI_API_KEY`. `EMBEDDING_PROVIDER=huggingface` uses `sentence-transformers/all-MiniLM-L6-v2` locally (384 dimensions) and does not use an API key.
 
 ## Setup
 
@@ -73,6 +73,10 @@ From this directory, with Python 3.12:
 python3.12 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
+# Do NOT use "pip install --upgrade pip": it downloads the new pip through the old, vulnerable one.
+# Install the pinned pip 26.2.2 wheel with a SHA256 check instead (eMudhra/emSign CA incident).
+# See: https://discuss.python.org/t/information-for-python-users-regarding-emudhra-emsign-ca-certificate-security-incident/109576
+python -m pip install "pip @ https://files.pythonhosted.org/packages/3f/06/3e4420302363fbb71be3c7f35ce042f54bfca330e3e66b3a2e3c4cca579f/pip-26.2.2-py3-none-any.whl#sha256=fd7f4dfa8190e014013b9f08f3e973f4e4c26ffd179a204895533a7254813a70"
 pip install -r requirements.txt
 ```
 
@@ -82,7 +86,7 @@ Copy the env template and set `PINECONE_API_KEY` plus the key for the chat provi
 cp .env.dist .env
 ```
 
-The first query downloads `sentence-transformers/all-MiniLM-L6-v2` if it is not already cached.
+The first query calls OpenAI to embed with `text-embedding-3-small`. `EMBEDDING_PROVIDER=huggingface` downloads `sentence-transformers/all-MiniLM-L6-v2` instead, if it is not already cached.
 
 ## Replicate the Pinecone index
 
@@ -94,7 +98,7 @@ The first query downloads `sentence-transformers/all-MiniLM-L6-v2` if it is not 
 | `NAMESPACE` | `delivery4` |
 | Metric | cosine |
 | Cloud / region | `aws` / `us-east-1` |
-| Dimension | the live embedding model (384 for the default Hugging Face model) |
+| Dimension | 1536 (`text-embedding-3-small`). The live model must match `EMBEDDING_DIMENSION`. |
 
 Each vector stores the chunk text in metadata under `text`, plus `source`, `doc_id` (the leading `NE-100` id, or the file stem), `format`, `chunk_index`, `char_count`, and `page` when the file has pages.
 
