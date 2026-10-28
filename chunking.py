@@ -39,7 +39,14 @@ class Chunkener:
         )
 
     def clean_text(self, text: str) -> str:
-        """Drop page headers, junk characters, and repeated spaces."""
+        """Prepare Markdown for chunking and embedding.
+
+        Drop PDF page-header lines that contain ``Pág.`` and a page number,
+        remove the ``■`` extraction artifact, collapse three or more line
+        breaks to a single blank line, and collapse repeated spaces and tabs
+        to one space. Line breaks stay so the splitter can still cut on
+        paragraphs. Leading and trailing whitespace is stripped.
+        """
         text = _PAGE_HEADER.sub("", text)
         text = text.replace("■", "")
         text = _EXTRA_BREAKS.sub("\n\n", text)

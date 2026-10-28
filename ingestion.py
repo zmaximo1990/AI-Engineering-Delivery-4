@@ -8,7 +8,7 @@ from langchain_core.documents import Document
 
 from settings import DOC_ID, settings
 from extraction import AssetExtractor
-from processing import Chunkener
+from chunking import Chunkener
 from factory import VectorStoreFactory
 from vectorstore import VectorStoreManager
 

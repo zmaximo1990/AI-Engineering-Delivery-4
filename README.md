@@ -15,7 +15,7 @@ Sequence diagram: [`diagrams/ingestion.mermaid`](diagrams/ingestion.mermaid)
 3. The vector index is opened or created (Pinecone or Chroma), together with the embedding model.
 4. Existing chunks in the index are counted.
 5. If the index already has data, ingestion stops. The files are not embedded again.
-6. If the index is empty, supported files are listed. Text extraction is unified to Markdown, with page-by-page segmentation and consumption first when the format allows it. A format without pages becomes one segment page. Chunking runs on each `DocumentPage` after it has been converted to Markdown. Each chunk gets an id and metadata.
+6. If the index is empty, supported files are listed. Text extraction is unified to Markdown, with page-by-page segmentation and consumption first when the format allows it. A format without pages becomes one segment page. Chunking runs on each `DocumentPage` after it has been converted to Markdown. Before the split, page-header lines that contain `Pág.` and a page number are removed, the `■` extraction artifact is dropped, extra blank lines collapse to one, and repeated spaces or tabs collapse to a single space. Line breaks stay so chunks can still break on paragraphs. Each chunk gets an id and metadata.
 7. Chunks are embedded in batches and written to the store.
 8. The number of chunks written is returned.
 
@@ -123,7 +123,7 @@ Delete `vectorstore/` to reindex that collection.
 | `prompts.py` | Grounded system prompt. Context and question are template variables |
 | `ingestion.py` | Lists `data/`, chunks each Markdown `DocumentPage`, and skips a populated index |
 | `extraction.py` | `AssetExtractor`: PDF, DOCX, Markdown, JSON, and plain text to Markdown `DocumentPage`s, page by page when the format has pages |
-| `processing.py` | `Chunkener`: clean text, then split at 500 tokens with 50 of overlap |
+| `chunking.py` | `Chunkener`: clean text (page headers, `■`, extra breaks, repeated spaces), then split at 500 tokens with 50 of overlap |
 | `retriever.py` | BM25 plus vector search, fused by `EnsembleRetriever` |
 | `vectorstore.py` | Pinecone and Chroma backends, upsert, and `as_retriever` |
 | `embeddings.py` | Hugging Face and OpenAI embedding clients |
