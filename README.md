@@ -113,7 +113,7 @@ Delete `vectorstore/` to reindex that collection.
 
 | File | Role |
 |------|------|
-| `main.py` | Asks the user for a question, or runs one question / the two demo questions |
+| `main.py` | Asks a question, runs one question, runs the demo, or scores both sets with `--eval` / `-e` |
 | `samples.py` | Grounded question and trap question |
 | `chain.py` | LCEL chain, `build_chain`, and `get_rag_response()` |
 | `prompts.py` | Grounded system prompt. Context and question are template variables |
@@ -128,8 +128,9 @@ Delete `vectorstore/` to reindex that collection.
 | `schemas.py` | `LLMAnswer`, `RAGAnswer`, `DocumentPage`, providers, and `LLMConfig` |
 | `settings.py` | Proyect settings loaded from the environment (`.env` file) like chunk size, `top_k`, Pinecone names, paths, and retry settings, loaded from the environment through `Settings` |
 | `data/` | Nimbus engineering notes (PDF and DOCX) used as the corpus |
-| `tests/golden_set.json` | Questions whose expected source document is known |
-| `tests/unanswerable_set.json` | Questions the corpus does not answer |
+| `tests/evaluate.py` | Precision@k, Recall@k, Hit@k, and abstention on the unanswerable set |
+| `tests/golden_set.json` | 30 questions with the source document ids used for Precision@k and Recall@k |
+| `tests/unanswerable_set.json` | 10 questions the corpus does not answer, plus hallucination patterns |
 | `diagrams/` | Sequence diagrams for ingestion and ask flows |
 | `requirements.txt` | Dependencies |
 | `.env.dist` | Env template with empty secrets |
@@ -152,7 +153,46 @@ python main.py -q "¿Cuántos segundos hay que mantener presionado el botón RES
 
 # Two checks from samples.py, then exit
 python main.py --demo
+
+# Golden set and unanswerable set, then exit
+python main.py --eval
+python main.py -e -p anthropic
 ```
+
+`--eval` cannot be combined with `--demo` or `--question`.
+
+### Evaluation
+
+`tests/evaluate.py` scores the hybrid retriever and the grounded answers. `python main.py --eval` (or `-e`) prepares the index, prints the report, and exits. The same report is available directly:
+
+```bash
+python tests/evaluate.py
+python tests/evaluate.py -k 5
+python tests/evaluate.py -p gemini
+```
+
+`main.py --eval` keeps `hybrid_k` chunks per question (5 by default). `-k` is only on `tests/evaluate.py`. The golden set does not call the chat model. The unanswerable set does, so it needs the key for the selected provider.
+
+#### Golden set
+
+`tests/golden_set.json` has 30 questions. Each one lists the source documents that contain the answer (`relevant_docs`, such as `NE-100`). The hybrid retriever returns the top k chunks.
+
+| Metric | Meaning |
+|--------|---------|
+| Precision@k | Share of the k retrieved chunks that come from an expected document |
+| Recall@k | Share of the expected documents that appear among those chunks. With one expected document this is 1 when that document is in the top k, and 0 otherwise |
+| Hit@k | Questions that retrieved at least one expected document |
+
+Each question prints `P@k`, `R@k`, the retrieved document ids, and the expected ids. The report then prints the mean Precision@k, the mean Recall@k, and Hit@k.
+
+#### Unanswerable set
+
+`tests/unanswerable_set.json` has 10 questions the corpus does not answer. Each question runs through the RAG chain. A case passes when both of these hold:
+
+- The answer says the information is not in the available documentation.
+- The answer matches none of that case's hallucination patterns, such as an invented price, phone number, or USB version.
+
+The report prints abstention, hallucination, and pass or fail for each question, then the totals. A failing answer is followed by a short excerpt.
 
 ### Docker
 
@@ -162,6 +202,7 @@ Create a `.env` first. Compose passes it into the container. `./vectorstore` is 
 docker compose build
 docker compose run --rm app
 docker compose run --rm app python main.py --demo
+docker compose run --rm app python main.py --eval
 docker compose run --rm app python main.py -p gemini
 ```
 
