@@ -20,7 +20,6 @@ from pinecone.exceptions import PineconeException, UnauthorizedException
 
 from settings import settings
 from embeddings import BaseEmbeddings
-from factory import EmbeddingsFactory
 
 logger = logging.getLogger(__name__)
 
@@ -51,6 +50,8 @@ class VectorStoreManager(ABC):
     """
 
     def __init__(self, embeddings: BaseEmbeddings | None = None) -> None:
+        from factory import EmbeddingsFactory
+        
         embeddings_client: BaseEmbeddings = embeddings or EmbeddingsFactory.create()
         self.embedding_model_name = embeddings_client.model_name
         self.embeddings = embeddings_client.get_embeddings_model()
@@ -437,19 +438,3 @@ class PineconeStoreManager(VectorStoreManager):
             self.index.delete(ids=ids, namespace=self.namespace)
         except _PINECONE_ERRORS as exc:
             raise VectorStoreError("Could not delete documents from the vector store.") from exc
-
-
-# TODO move to factory.py
-_manager: VectorStoreManager | None = None
-
-def get_vector_store() -> VectorStoreManager:
-    """Return the process-wide store so the embedding model is loaded once (singleton)."""
-    global _manager
-    if _manager is None:
-        if settings.vector_store == "pinecone":
-            _manager = PineconeStoreManager()
-        elif settings.vector_store == "chroma":
-            _manager = ChromaStoreManager()
-        else:
-            raise ValueError("VECTOR_STORE must be one of: pinecone, chroma")
-    return _manager

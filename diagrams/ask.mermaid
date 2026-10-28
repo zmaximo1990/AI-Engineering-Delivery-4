@@ -23,7 +23,7 @@ sequenceDiagram
     Note over Ingestor: reads and chunks data/ again, without writing the index
     Ingestor-->>Retriever: documents
     Retriever->>BM25: from_documents, k=5
-    Retriever->>VectorStoreManager: get_vector_store()
+    Retriever->>VectorStoreManager: VectorStoreFactory.create()
     VectorStoreManager-->>Retriever: Store
     Retriever->>VectorStore: as_retriever(k=5, similarity)
     VectorStore-->>Retriever: VectorStoreRetriever

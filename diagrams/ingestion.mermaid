@@ -13,7 +13,7 @@ sequenceDiagram
     Main->>Ingestor: Ingestor()
     Note over Ingestor: creates AssetExtractor and Chunkener
     Main->>Ingestor: ingest_if_needed()
-    Ingestor->>Store: get_vector_store()
+    Ingestor->>Store: VectorStoreFactory.create()
 
     alt the store does not exist yet
         Store->>Embeddings: EmbeddingsFactory.create()

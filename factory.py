@@ -5,6 +5,7 @@ from settings import settings
 from embeddings import BaseEmbeddings, HuggingFaceEmbeddings, OpenAIEmbeddings
 from llm import AnthropicClient, BaseLLMClient, GeminiClient, OpenAIClient
 from schemas import EmbeddingsProvider, LLMConfig, Provider
+from vectorstore import VectorStoreManager
 
 logger = logging.getLogger(__name__)
 
@@ -79,3 +80,32 @@ class EmbeddingsFactory:
         except ValueError as exc:
             allowed = ", ".join(item.value for item in EmbeddingsProvider)
             raise ValueError(f"EMBEDDING_PROVIDER must be one of: {allowed}") from exc
+
+
+class VectorStoreFactory:
+    """Factory that returns one vector store for the process."""
+
+    _manager: VectorStoreManager | None = None
+
+    @staticmethod
+    def get_manager() -> VectorStoreManager:
+        """Return the process-wide store so the embedding model is loaded once.
+
+        ``VECTOR_STORE`` selects Pinecone or Chroma. Later calls return the
+        same instance.
+        """
+        if VectorStoreFactory._manager is None:
+            # Imported here because vectorstore imports EmbeddingsFactory.
+            from vectorstore import ChromaStoreManager, PineconeStoreManager
+
+            if settings.vector_store == "pinecone":
+                VectorStoreFactory._manager = PineconeStoreManager()
+            elif settings.vector_store == "chroma":
+                VectorStoreFactory._manager = ChromaStoreManager()
+            else:
+                raise ValueError("VECTOR_STORE must be one of: pinecone, chroma")
+            logger.info(
+                "Vector store created: %s",
+                type(VectorStoreFactory._manager).__name__,
+            )
+        return VectorStoreFactory._manager

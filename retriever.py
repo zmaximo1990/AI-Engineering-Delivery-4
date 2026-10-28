@@ -10,7 +10,7 @@ from langchain_core.documents import Document
 
 from settings import settings
 from ingestion import Ingestor
-from vectorstore import get_vector_store
+from factory import VectorStoreFactory
 
 logger = logging.getLogger(__name__)
 
@@ -32,15 +32,15 @@ class Retriever:
 
         # Create the lexical retriever. It must be created in a separate thread to avoid blocking the main thread because the BM25Retriever is a I/O operation to read files from the filesystem.
         # lexical: BM25Retriever = await asyncio.to_thread(BM25Retriever.from_documents, documents)
-        lexical = BM25Retriever.from_documents(documents)
-        lexical.k = self.k
+        lexical_retriever = BM25Retriever.from_documents(documents)
+        lexical_retriever.k = self.k
 
-        # Create the vector retriever
-        vector = get_vector_store().as_retriever(k=self.k, search_type="similarity")
+        # Get the vector retriever
+        vector_retriever = VectorStoreFactory.get_manager().as_retriever(k=self.k, search_type="similarity")
 
         # Create the ensemble retriever
         self._ensemble = EnsembleRetriever(
-            retrievers=[lexical, vector],
+            retrievers=[lexical_retriever, vector_retriever],
             # Distribute the weight between the two retrievers
             weights=[0.5, 0.5],
         )

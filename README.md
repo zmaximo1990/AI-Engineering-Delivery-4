@@ -124,7 +124,7 @@ Delete `vectorstore/` to reindex that collection.
 | `vectorstore.py` | Pinecone and Chroma backends, upsert, and `as_retriever` |
 | `embeddings.py` | Hugging Face and OpenAI embedding clients |
 | `llm.py` | `OpenAIClient`, `AnthropicClient`, and `GeminiClient` |
-| `factory.py` | Builds a chat client or an embeddings client from config |
+| `factory.py` | Builds a chat client, an embeddings client, or the process-wide vector store |
 | `schemas.py` | `LLMAnswer`, `RAGAnswer`, `DocumentPage`, providers, and `LLMConfig` |
 | `settings.py` | Proyect settings loaded from the environment (`.env` file) like chunk size, `top_k`, Pinecone names, paths, and retry settings, loaded from the environment through `Settings` |
 | `data/` | Nimbus engineering notes (PDF and DOCX) used as the corpus |

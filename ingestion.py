@@ -10,7 +10,8 @@ from langchain_core.documents import Document
 from settings import settings
 from extraction import AssetExtractor
 from processing import Chunkener
-from vectorstore import VectorStoreManager, get_vector_store
+from factory import VectorStoreFactory
+from vectorstore import VectorStoreManager
 
 logger = logging.getLogger(__name__)
 
@@ -82,7 +83,7 @@ class Ingestor:
         A non-empty collection is treated as an existing index, so the files
         are not embedded again. Returns the number of chunks written on this call.
         """
-        store: VectorStoreManager = get_vector_store()
+        store: VectorStoreManager = VectorStoreFactory.get_manager()
         existing = store.count()
         if existing > 0:
             logger.info(
