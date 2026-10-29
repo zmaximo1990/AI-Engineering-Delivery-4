@@ -5,6 +5,11 @@ document. Recall@k is the share of expected documents that appear in those
 chunks. A question with one expected document therefore has Recall@k of 1
 when that document is in the top k, and 0 otherwise.
 
+MRR@k is the mean reciprocal rank. For one question the reciprocal rank is
+1 divided by the position of the first relevant chunk in the top k, or 0
+when none of those chunks comes from an expected document. Position 1 gives
+1.00, position 2 gives 0.50, and a miss gives 0.
+
 Unanswerable questions must be declined. The answer has to say that the
 information is not in the documentation, and it must not match a
 hallucination pattern from the set.
@@ -70,7 +75,7 @@ _ABSTENTION = re.compile(
 
 @dataclass(frozen=True)
 class GoldenResult:
-    """Precision@k and Recall@k for one golden question."""
+    """Precision@k, Recall@k, and reciprocal rank for one golden question."""
 
     case_id: str
     useful: int
@@ -79,6 +84,7 @@ class GoldenResult:
     k: int
     retrieved: tuple[str, ...]
     expected: tuple[str, ...]
+    first_rank: int | None = None
     error: str | None = None
 
     @property
@@ -92,6 +98,13 @@ class GoldenResult:
         if self.error is not None or self.expected_count <= 0:
             return 0.0
         return self.found / self.expected_count
+
+    @property
+    def reciprocal_rank(self) -> float:
+        """1/rank of the first relevant chunk in the top k, or 0 on a miss."""
+        if self.error is not None or self.first_rank is None or self.first_rank < 1:
+            return 0.0
+        return 1.0 / self.first_rank
 
 
 @dataclass(frozen=True)
@@ -230,7 +243,8 @@ def score_golden_case(
     useful = 0
     found: set[str] = set()
     retrieved: list[str] = []
-    for document in documents:
+    first_rank: int | None = None
+    for rank, document in enumerate(documents, start=1):
         doc_id = document_id(document)
         source = str(document.metadata.get("source", ""))
         if doc_id and doc_id not in retrieved:
@@ -240,6 +254,8 @@ def score_golden_case(
         if not matched_id and not matched_file:
             continue
         useful += 1
+        if first_rank is None:
+            first_rank = rank
         if matched_id:
             found.add(doc_id)
         mapped = file_to_id.get(source)
@@ -254,6 +270,7 @@ def score_golden_case(
         k=k,
         retrieved=tuple(retrieved),
         expected=tuple(expected_ids),
+        first_rank=first_rank,
     )
 
 
@@ -271,7 +288,9 @@ def _print_golden_header(total: int, k: int) -> None:
     print(f"\nGolden set ({total} questions, k={k})", flush=True)
     print(
         f"Precision@{k} = chunks from an expected document / {k}. "
-        f"Recall@{k} = expected documents present in the top {k} / expected documents.",
+        f"Recall@{k} = expected documents present in the top {k} / expected documents. "
+        f"RR@{k} = 1 / rank of the first relevant chunk (0 if none). "
+        f"MRR@{k} is the mean of those reciprocal ranks.",
         flush=True,
     )
 
@@ -280,10 +299,12 @@ def _print_golden_row(row: GoldenResult, k: int) -> None:
     if row.error:
         print(f"{row.case_id:<6} ERROR  {row.error}", flush=True)
         return
+    rank = "-" if row.first_rank is None else str(row.first_rank)
     print(
         f"{row.case_id:<6} "
         f"P@{k}={row.precision:.2f} ({row.useful}/{k})  "
         f"R@{k}={row.recall:.2f} ({row.found}/{row.expected_count})  "
+        f"RR@{k}={row.reciprocal_rank:.2f} (rank {rank})  "
         f"retrieved={_join(row.retrieved)}  expected={_join(row.expected)}",
         flush=True,
     )
@@ -296,10 +317,12 @@ def _print_golden_summary(rows: list[GoldenResult], k: int) -> None:
     if not scored:
         print(f"Mean Precision@{k}: n/a", flush=True)
         print(f"Mean Recall@{k}: n/a", flush=True)
+        print(f"MRR@{k}: n/a", flush=True)
         print(f"Hit@{k}: 0/{len(rows)}", flush=True)
         return
     print(f"Mean Precision@{k}: {_mean([row.precision for row in scored]):.2f}", flush=True)
     print(f"Mean Recall@{k}: {_mean([row.recall for row in scored]):.2f}", flush=True)
+    print(f"MRR@{k}: {_mean([row.reciprocal_rank for row in scored]):.2f}", flush=True)
     print(
         f"Hit@{k}: {hits}/{len(scored)} questions retrieved at least one expected document",
         flush=True,
@@ -487,7 +510,7 @@ async def run_evaluation(config: LLMConfig | None = None, k: int | None = None) 
 
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Score Precision@k, Recall@k, and abstention on the evaluation sets."
+        description="Score Precision@k, Recall@k, MRR@k, and abstention on the evaluation sets."
     )
     parser.add_argument(
         "-p",

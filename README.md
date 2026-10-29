@@ -132,7 +132,7 @@ Delete `vectorstore/` to reindex that collection.
 | `schemas.py` | `LLMAnswer`, `RAGAnswer`, `DocumentPage`, providers, and `LLMConfig` |
 | `settings.py` | Proyect settings loaded from the environment (`.env` file) like chunk size, `top_k`, Pinecone names, paths, and retry settings, loaded from the environment through `Settings` |
 | `data/` | Nimbus engineering notes (PDF, DOCX, Markdown, JSON, and CSV) used as the corpus |
-| `tests/evaluate.py` | Precision@k, Recall@k, Hit@k, and abstention on the unanswerable set |
+| `tests/evaluate.py` | Precision@k, Recall@k, MRR@k, Hit@k, and abstention on the unanswerable set |
 | `tests/golden_set.json` | 33 questions with the source document ids used for Precision@k and Recall@k |
 | `tests/unanswerable_set.json` | 10 questions the corpus does not answer, plus hallucination patterns |
 | `diagrams/` | Sequence diagrams for ingestion and ask flows |
@@ -235,9 +235,10 @@ python tests/evaluate.py -p gemini
 |--------|---------|
 | Precision@k | Share of the k retrieved chunks that come from an expected document |
 | Recall@k | Share of the expected documents that appear among those chunks. With one expected document this is 1 when that document is in the top k, and 0 otherwise |
+| MRR@k | Mean reciprocal rank. Each question contributes `1 / rank` of its first relevant chunk in the top k, or 0 when that chunk is missing. Rank 1 is 1.00 and rank 2 is 0.50 |
 | Hit@k | Questions that retrieved at least one expected document |
 
-Each question prints `P@k`, `R@k`, the retrieved document ids, and the expected ids. The report then prints the mean Precision@k, the mean Recall@k, and Hit@k.
+Each question prints `P@k`, `R@k`, `RR@k` (that question's reciprocal rank), the retrieved document ids, and the expected ids. The report then prints the mean Precision@k, the mean Recall@k, MRR@k, and Hit@k.
 
 #### Unanswerable set
 
