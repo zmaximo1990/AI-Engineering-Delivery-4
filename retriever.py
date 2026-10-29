@@ -83,7 +83,19 @@ class Retriever:
         # Get the vector retriever
         vector_retriever = VectorStoreFactory.get_manager().as_retriever(k=self.k, search_type="similarity")
 
-        # Create the ensemble retriever
+        # Create the ensemble retriever to apply the first top-k ranking.
+        # The re-ranking is not implemented in this file. invoke and ainvoke only
+        # call the ensemble, then slice the already sorted list to k. LangChain
+        # does the sort in EnsembleRetriever.weighted_reciprocal_rank:
+        # invoke -> rank_fusion -> weighted_reciprocal_rank, and
+        # ainvoke -> arank_fusion -> weighted_reciprocal_rank.
+        # rank_fusion fetches the BM25 list and the vector list, then each
+        # document scores weight / (rank + 60). The 0.5/0.5 weights below are
+        # that weight, and the fused list is sorted by the score, descending.
+        # RRF fusion could be replaced here by a cross-encoder re-ranker,
+        # which would take the place of EnsembleRetriever rather than wrap it:
+        # score each (question, chunk) pair and sort the candidates by that score.
+        # https://www.sbert.net/examples/sentence_transformer/applications/retrieve_rerank/README.html
         self._ensemble = EnsembleRetriever(
             retrievers=[lexical_retriever, vector_retriever],
             # Distribute the weight between the two retrievers
