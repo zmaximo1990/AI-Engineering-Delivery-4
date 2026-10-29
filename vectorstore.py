@@ -348,8 +348,10 @@ class PineconeStoreManager(VectorStoreManager):
 
     def _ensure_index(self) -> None:
         """Create a Serverless index when it is missing, and reject a dimension mismatch."""
+        logger.info("Ensuring Pinecone index exists (index=%s, dimension=%d, embedding=%s)", self.index_name, self.dimension, self.embedding_model_name)
         names = self.client.list_indexes().names()
         if self.index_name not in names:
+            logger.info("Index does not exist, creating it (index=%s, dimension=%d, embedding=%s)", self.index_name, self.dimension, self.embedding_model_name)
             try:
                 self.client.create_index(
                     name=self.index_name,

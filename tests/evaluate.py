@@ -536,7 +536,7 @@ async def run_evaluation(config: LLMConfig | None = None, k: int | None = None) 
     )
     print("Loading the hybrid retriever...", flush=True)
     _quiet_logs()
-    retriever = Retriever(k=cutoff)
+    retriever = Retriever.get(k=cutoff)
 
     _print_golden_header(len(golden_cases), cutoff)
     golden_rows: list[GoldenResult] = []

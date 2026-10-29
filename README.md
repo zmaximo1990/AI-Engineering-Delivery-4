@@ -1,6 +1,6 @@
 # Code Delivery for Module #4 | Scalable RAG with Pinecone
 
-Async Python pipeline that answers a question from a hybrid index. Files in `data/` (PDF, DOCX, Markdown, JSON, CSV, and plain text) are converted to Markdown, split into token-sized chunks, and embedded once. A LangChain LCEL chain fuses BM25 with vector similarity, asks the model to answer only from that context, and attaches the source filenames itself.
+Async Python pipeline that answers a question from a hybrid index. Files in `data/` (PDF, DOCX, Markdown, JSON, CSV, and plain text) are converted to Markdown uniformly, split into token-sized chunks, and embedded once. A LangChain LCEL chain fuses BM25 with vector similarity, asks the model to answer only from that context, and attaches the source filenames itself.
 
 ## Flows
 

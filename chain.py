@@ -1,6 +1,5 @@
 """LCEL RAG chain: retrieve, attach context, generate, assemble sources."""
 
-import asyncio
 import logging
 
 from langchain_core.documents import Document
@@ -76,10 +75,8 @@ async def retrieve_documents(inputs: dict) -> list[Document]:
 
     question: str = inputs["question"]
 
-    # retriever: Retriever = await asyncio.to_thread(Retriever)
-    retriever: Retriever = Retriever()
+    retriever = await Retriever.aget()
     documents: list[Document] = await retriever.ainvoke(question)
-    # documents: list[Document] = retriever.invoke(question)
 
     logger.info("Retrieved %d fragments", len(documents))
     for index, document in enumerate(documents, start=1):
