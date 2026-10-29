@@ -72,6 +72,19 @@ _ABSTENTION = re.compile(
     re.IGNORECASE,
 )
 
+# Inclusive band on the two-decimal score. Inside it the metric is acceptable.
+# Precision is relevant chunks / k, so 0.50 means half the context comes from
+# an expected document. Recall 0.80 means most expected documents were found.
+# MRR 0.50 is a first relevant chunk by rank 2, on average. Hit 0.80 means
+# four of five questions retrieved an expected document. Abstention and passes
+# use the same 0.80 floor. A hallucination signal is acceptable only at 0.
+_PRECISION_BAND = (0.50, 1.00)
+_RECALL_BAND = (0.80, 1.00)
+_MRR_BAND = (0.50, 1.00)
+_HIT_BAND = (0.80, 1.00)
+_ABSTAIN_BAND = (0.80, 1.00)
+_HALLUCINATION_BAND = (0.00, 0.00)
+_PASS_BAND = (0.80, 1.00)
 
 @dataclass(frozen=True)
 class GoldenResult:
@@ -280,6 +293,18 @@ def _mean(values: list[float]) -> float:
     return sum(values) / len(values)
 
 
+def _shown(value: float) -> float:
+    """Return the score as printed, so the mark matches the two decimals."""
+    return float(f"{value:.2f}")
+
+
+def _mark(value: float, band: tuple[float, float]) -> str:
+    """Parenthetical acceptable range, then ✅ inside the band and ❌ outside it."""
+    low, high = band
+    flag = "✅" if low <= _shown(value) <= high else "❌"
+    return f"(acceptable: {low:.2f}-{high:.2f}) {flag}"
+
+
 def _join(items: tuple[str, ...] | list[str]) -> str:
     return ",".join(items) if items else "-"
 
@@ -318,13 +343,20 @@ def _print_golden_summary(rows: list[GoldenResult], k: int) -> None:
         print(f"Mean Precision@{k}: n/a", flush=True)
         print(f"Mean Recall@{k}: n/a", flush=True)
         print(f"MRR@{k}: n/a", flush=True)
-        print(f"Hit@{k}: 0/{len(rows)}", flush=True)
+        if rows:
+            print(f"Hit@{k}: 0.00 (0/{len(rows)}) {_mark(0.0, _HIT_BAND)}", flush=True)
+        else:
+            print(f"Hit@{k}: n/a", flush=True)
         return
-    print(f"Mean Precision@{k}: {_mean([row.precision for row in scored]):.2f}", flush=True)
-    print(f"Mean Recall@{k}: {_mean([row.recall for row in scored]):.2f}", flush=True)
-    print(f"MRR@{k}: {_mean([row.reciprocal_rank for row in scored]):.2f}", flush=True)
+    precision = _mean([row.precision for row in scored])
+    recall = _mean([row.recall for row in scored])
+    mrr = _mean([row.reciprocal_rank for row in scored])
+    hit_rate = hits / len(scored)
+    print(f"Mean Precision@{k}: {precision:.2f} {_mark(precision, _PRECISION_BAND)}", flush=True)
+    print(f"Mean Recall@{k}: {recall:.2f} {_mark(recall, _RECALL_BAND)}", flush=True)
+    print(f"MRR@{k}: {mrr:.2f} {_mark(mrr, _MRR_BAND)}", flush=True)
     print(
-        f"Hit@{k}: {hits}/{len(scored)} questions retrieved at least one expected document",
+        f"Hit@{k}: {hit_rate:.2f} ({hits}/{len(scored)}) {_mark(hit_rate, _HIT_BAND)}",
         flush=True,
     )
     if len(scored) != len(rows):
@@ -366,11 +398,25 @@ def _print_unanswerable(rows: list[UnanswerableResult], total: int) -> None:
     hallucinated = sum(1 for row in scored if row.hallucinated)
     print(flush=True)
     if scored:
-        print(f"Abstained: {abstained}/{len(scored)}", flush=True)
-        print(f"Hallucination signals: {hallucinated}/{len(scored)}", flush=True)
-        print(f"Passed: {passed}/{len(scored)}", flush=True)
+        abstained_rate = abstained / len(scored)
+        hallucinated_rate = hallucinated / len(scored)
+        passed_rate = passed / len(scored)
+        print(
+            f"Abstained: {abstained_rate:.2f} ({abstained}/{len(scored)}) "
+            f"{_mark(abstained_rate, _ABSTAIN_BAND)}",
+            flush=True,
+        )
+        print(
+            f"Hallucination signals: {hallucinated_rate:.2f} ({hallucinated}/{len(scored)}) "
+            f"{_mark(hallucinated_rate, _HALLUCINATION_BAND)}",
+            flush=True,
+        )
+        print(
+            f"Passed: {passed_rate:.2f} ({passed}/{len(scored)}) {_mark(passed_rate, _PASS_BAND)}",
+            flush=True,
+        )
     else:
-        print("Passed: 0/0", flush=True)
+        print("Passed: n/a", flush=True)
     if len(scored) != total:
         print(f"Completed without error: {len(scored)}/{total}", flush=True)
     if len(rows) < total and rows and rows[-1].error and "is not configured" in rows[-1].error:

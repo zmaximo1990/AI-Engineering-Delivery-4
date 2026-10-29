@@ -238,7 +238,14 @@ python tests/evaluate.py -p gemini
 | MRR@k | Mean reciprocal rank. Each question contributes `1 / rank` of its first relevant chunk in the top k, or 0 when that chunk is missing. Rank 1 is 1.00 and rank 2 is 0.50 |
 | Hit@k | Questions that retrieved at least one expected document |
 
-Each question prints `P@k`, `R@k`, `RR@k` (that question's reciprocal rank), the retrieved document ids, and the expected ids. The report then prints the mean Precision@k, the mean Recall@k, MRR@k, and Hit@k.
+Each question prints `P@k`, `R@k`, `RR@k` (that question's reciprocal rank), the retrieved document ids, and the expected ids. The report then prints the mean Precision@k, the mean Recall@k, MRR@k, and Hit@k. Each of those means is followed by the range where it is acceptable, then ✅ when the score is inside that range and ❌ when it is outside.
+
+| Metric | Acceptable |
+|--------|------------|
+| Precision@k | 0.50–1.00 |
+| Recall@k | 0.80–1.00 |
+| MRR@k | 0.50–1.00 |
+| Hit@k | 0.80–1.00 |
 
 #### Unanswerable set
 
@@ -247,7 +254,7 @@ Each question prints `P@k`, `R@k`, `RR@k` (that question's reciprocal rank), the
 - The answer says the information is not in the available documentation.
 - The answer matches none of that case's hallucination patterns, such as an invented price, phone number, or USB version.
 
-The report prints abstention, hallucination, and pass or fail for each question, then the totals. A failing answer is followed by a short excerpt.
+The report prints abstention, hallucination, and pass or fail for each question, then the totals. A failing answer is followed by a short excerpt. The totals use the same ✅ / ❌ mark. Abstention and passes are acceptable from 0.80 to 1.00. Hallucination signals are acceptable only at 0.00.
 
 ### Docker
 
