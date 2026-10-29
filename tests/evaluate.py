@@ -8,6 +8,9 @@ when that document is in the top k, and 0 otherwise.
 Unanswerable questions must be declined. The answer has to say that the
 information is not in the documentation, and it must not match a
 hallucination pattern from the set.
+
+Golden cases cite files in ``data/``. Each cited file must exist and its
+name must start with the document id.
 """
 
 import sys
@@ -356,10 +359,28 @@ def _quiet_logs() -> None:
 
 
 def _validate_golden(cases: list[dict]) -> None:
+    """Check questions and that each cited file exists for its document id."""
     for index, case in enumerate(cases, start=1):
         case_id = _case_id(case, f"golden[{index}]")
         _question(case, case_id)
         _expected(case, case_id)
+        doc_ids = _string_list(case.get("relevant_docs"), case_id, "relevant_docs")
+        filenames = _string_list(
+            case.get("relevant_files") or [],
+            case_id,
+            "relevant_files",
+        )
+        if len(filenames) != len(doc_ids):
+            raise ValueError(
+                f"{case_id}: relevant_files must list one file per relevant_docs entry"
+            )
+        for doc_id, filename in zip(doc_ids, filenames):
+            path = settings.data_dir / filename
+            if not path.is_file():
+                raise ValueError(f"{case_id}: data file not found: {filename}")
+            match = DOC_ID.match(filename)
+            if match is None or match.group(1).upper() != doc_id.upper():
+                raise ValueError(f"{case_id}: {filename} is not the file for {doc_id}")
 
 
 def _validate_unanswerable(cases: list[dict]) -> None:

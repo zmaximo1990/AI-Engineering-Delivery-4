@@ -288,11 +288,13 @@
     "difficulty": "easy",
     "relevant_docs": [
       "NE-500",
-      "NE-220"
+      "NE-220",
+      "NE-800"
     ],
     "relevant_files": [
       "NE-500_Whitepaper_Arquitectura_Seguridad.pdf",
-      "NE-220_Guia_Configuracion_Parametros.docx"
+      "NE-220_Guia_Configuracion_Parametros.docx",
+      "NE-800_Matriz_Compatibilidad_Versiones.csv"
     ],
     "evidence": [
       {
@@ -302,6 +304,10 @@
       {
         "doc": "NE-220",
         "text": "Frecuencia de rotación del certificado del dispositivo."
+      },
+      {
+        "doc": "NE-800",
+        "text": "La rotación automática del certificado es cada 90 días por defecto."
       }
     ]
   },
@@ -317,10 +323,12 @@
     "retrieval_hint": "lexical",
     "difficulty": "easy",
     "relevant_docs": [
-      "NE-220"
+      "NE-220",
+      "NE-800"
     ],
     "relevant_files": [
-      "NE-220_Guia_Configuracion_Parametros.docx"
+      "NE-220_Guia_Configuracion_Parametros.docx",
+      "NE-800_Matriz_Compatibilidad_Versiones.csv"
     ],
     "evidence": [
       {
@@ -330,6 +338,10 @@
       {
         "doc": "NE-220",
         "text": "10 a 300"
+      },
+      {
+        "doc": "NE-800",
+        "text": "el rango admitido es de 10 a 300."
       }
     ]
   },
@@ -346,11 +358,13 @@
     "difficulty": "medium",
     "relevant_docs": [
       "NE-220",
-      "NE-420"
+      "NE-420",
+      "NE-800"
     ],
     "relevant_files": [
       "NE-220_Guia_Configuracion_Parametros.docx",
-      "NE-420_Notas_de_Version_NimbusOS_4x.docx"
+      "NE-420_Notas_de_Version_NimbusOS_4x.docx",
+      "NE-800_Matriz_Compatibilidad_Versiones.csv"
     ],
     "evidence": [
       {
@@ -360,6 +374,10 @@
       {
         "doc": "NE-420",
         "text": "El valor por defecto de mqtt.keepalive_interval cambia de 60 a 30 segundos"
+      },
+      {
+        "doc": "NE-800",
+        "text": "Keepalive MQTT por defecto de 60 a 30 segundos"
       }
     ]
   },
@@ -463,11 +481,13 @@
     "difficulty": "medium",
     "relevant_docs": [
       "NE-410",
-      "NE-420"
+      "NE-420",
+      "NE-800"
     ],
     "relevant_files": [
       "NE-410_Procedimiento_Actualizacion_Firmware.docx",
-      "NE-420_Notas_de_Version_NimbusOS_4x.docx"
+      "NE-420_Notas_de_Version_NimbusOS_4x.docx",
+      "NE-800_Matriz_Compatibilidad_Versiones.csv"
     ],
     "evidence": [
       {
@@ -477,6 +497,10 @@
       {
         "doc": "NE-420",
         "text": "Esta versión es la base obligatoria para actualizar desde NimbusOS 3.x."
+      },
+      {
+        "doc": "NE-800",
+        "text": "Es la versión base obligatoria para actualizar desde NimbusOS 3.x."
       }
     ]
   },
@@ -683,10 +707,12 @@
     "retrieval_hint": "lexical",
     "difficulty": "easy",
     "relevant_docs": [
-      "NE-310"
+      "NE-310",
+      "NE-800"
     ],
     "relevant_files": [
-      "NE-310_Manual_Mantenimiento_Troubleshooting.docx"
+      "NE-310_Manual_Mantenimiento_Troubleshooting.docx",
+      "NE-800_Matriz_Compatibilidad_Versiones.csv"
     ],
     "evidence": [
       {
@@ -696,6 +722,10 @@
       {
         "doc": "NE-310",
         "text": "El comando crea un archivo /var/tmp/nimbus-diag-<AAAAMMDD-HHMMSS>.tar.gz"
+      },
+      {
+        "doc": "NE-800",
+        "text": "Crea /var/tmp/nimbus-diag-<AAAAMMDD-HHMMSS>.tar.gz con la configuración (sin contraseñas ni claves), los últimos registros, el estado de red y los códigos activos."
       }
     ]
   },
@@ -712,10 +742,12 @@
     "retrieval_hint": "hybrid",
     "difficulty": "medium",
     "relevant_docs": [
-      "NE-420"
+      "NE-420",
+      "NE-800"
     ],
     "relevant_files": [
-      "NE-420_Notas_de_Version_NimbusOS_4x.docx"
+      "NE-420_Notas_de_Version_NimbusOS_4x.docx",
+      "NE-800_Matriz_Compatibilidad_Versiones.csv"
     ],
     "evidence": [
       {
@@ -725,6 +757,10 @@
       {
         "doc": "NE-420",
         "text": "Se corrigió una fuga de memoria en el agrupador de telemetría que consumía aproximadamente 2 MB por hora"
+      },
+      {
+        "doc": "NE-800",
+        "text": "Consumía aproximadamente 2 MB por hora y podía terminar en un reinicio tras varias semanas de funcionamiento."
       }
     ]
   },
@@ -742,12 +778,14 @@
     "relevant_docs": [
       "NE-210",
       "NE-420",
-      "NE-600"
+      "NE-600",
+      "NE-800"
     ],
     "relevant_files": [
       "NE-210_Referencia_API_REST_v3.pdf",
       "NE-420_Notas_de_Version_NimbusOS_4x.docx",
-      "NE-600_Politica_Soporte_SLA.docx"
+      "NE-600_Politica_Soporte_SLA.docx",
+      "NE-800_Matriz_Compatibilidad_Versiones.csv"
     ],
     "evidence": [
       {
@@ -761,6 +799,10 @@
       {
         "doc": "NE-600",
         "text": "La API REST v2 deja de estar disponible el 31 de diciembre de 2026."
+      },
+      {
+        "doc": "NE-800",
+        "text": "La API v2 deja de estar disponible el 31 de diciembre de 2026; los clientes deben migrar a la API v3."
       }
     ]
   },
@@ -843,12 +885,14 @@
     "relevant_docs": [
       "NE-300",
       "NE-310",
-      "NE-420"
+      "NE-420",
+      "NE-800"
     ],
     "relevant_files": [
       "NE-300_Catalogo_Codigos_Error.md",
       "NE-310_Manual_Mantenimiento_Troubleshooting.docx",
-      "NE-420_Notas_de_Version_NimbusOS_4x.docx"
+      "NE-420_Notas_de_Version_NimbusOS_4x.docx",
+      "NE-800_Matriz_Compatibilidad_Versiones.csv"
     ],
     "evidence": [
       {
@@ -862,6 +906,10 @@
       {
         "doc": "NE-420",
         "text": "Se corrigió un reinicio espurio por watchdog (NE-E2007)"
+      },
+      {
+        "doc": "NE-800",
+        "text": "Ocurría con modbus.poll_interval_ms menor a 200 y más de 64 registros Modbus configurados; en versiones anteriores se puede aumentar el intervalo a 200 ms o más."
       }
     ]
   },
@@ -880,12 +928,14 @@
     "relevant_docs": [
       "NE-410",
       "NE-420",
-      "NE-220"
+      "NE-220",
+      "NE-800"
     ],
     "relevant_files": [
       "NE-410_Procedimiento_Actualizacion_Firmware.docx",
       "NE-420_Notas_de_Version_NimbusOS_4x.docx",
-      "NE-220_Guia_Configuracion_Parametros.docx"
+      "NE-220_Guia_Configuracion_Parametros.docx",
+      "NE-800_Matriz_Compatibilidad_Versiones.csv"
     ],
     "evidence": [
       {
@@ -899,6 +949,131 @@
       {
         "doc": "NE-420",
         "text": "Los equipos con configuración explícita no se modifican."
+      },
+      {
+        "doc": "NE-800",
+        "text": "Los equipos con un valor configurado explícitamente no se modifican; el rango admitido es de 10 a 300."
+      }
+    ]
+  },
+  {
+    "id": "G31",
+    "question": "¿En qué fecha se lanzó NimbusOS 4.0.0 y qué aviso de seguridad corrige la versión 4.0.3?",
+    "expected_answer": "NimbusOS 4.0.0 se lanzó el 15 de septiembre de 2025. La 4.0.3, del 2 de diciembre de 2025, corrige el aviso NSA-2025-014 (escalada de privilegios en el servicio de administración local). Se recomienda actualizar los equipos que sigan en 4.0.0, 4.0.1 o 4.0.2.",
+    "key_facts": [
+      "2025-09-15",
+      "NSA-2025-014",
+      "4.0.0 a 4.0.2"
+    ],
+    "type": "temporal",
+    "retrieval_hint": "hybrid",
+    "difficulty": "medium",
+    "relevant_docs": [
+      "NE-800",
+      "NE-420"
+    ],
+    "relevant_files": [
+      "NE-800_Matriz_Compatibilidad_Versiones.csv",
+      "NE-420_Notas_de_Version_NimbusOS_4x.docx"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-800",
+        "text": "Corrección del aviso NSA-2025-014 (escalada de privilegios en el servicio de administración local)"
+      },
+      {
+        "doc": "NE-800",
+        "text": "Se recomienda actualizar todos los equipos con versiones 4.0.0 a 4.0.2."
+      },
+      {
+        "doc": "NE-420",
+        "text": "NimbusOS 4.0.0 (15 de septiembre de 2025)"
+      },
+      {
+        "doc": "NE-420",
+        "text": "se corrige una escalada de privilegios en el servicio de administración local descrita en el aviso NSA-2025-014"
+      }
+    ]
+  },
+  {
+    "id": "G32",
+    "question": "¿Desde qué versión está Modbus TCP, en qué puerto, y qué modelos lo incluyen?",
+    "expected_answer": "Desde NimbusOS 4.1.0, en el puerto 502, además de Modbus RTU sobre RS-485. La matriz de compatibilidad lo asigna a los modelos GX-200 y GX-200L.",
+    "key_facts": [
+      "4.1.0",
+      "502",
+      "GX-200L"
+    ],
+    "type": "table_lookup",
+    "retrieval_hint": "hybrid",
+    "difficulty": "medium",
+    "relevant_docs": [
+      "NE-800",
+      "NE-420",
+      "NE-510"
+    ],
+    "relevant_files": [
+      "NE-800_Matriz_Compatibilidad_Versiones.csv",
+      "NE-420_Notas_de_Version_NimbusOS_4x.docx",
+      "NE-510_Guia_Integracion_MQTT_Modbus.docx"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-800",
+        "text": "Soporte de Modbus TCP en el puerto 502"
+      },
+      {
+        "doc": "NE-800",
+        "text": "GX-200;GX-200L"
+      },
+      {
+        "doc": "NE-420",
+        "text": "Soporte de Modbus TCP en el puerto 502, además de Modbus RTU sobre RS-485."
+      },
+      {
+        "doc": "NE-510",
+        "text": "Modbus TCP está disponible desde NimbusOS 4.1.0 y usa el puerto 502 del equipo remoto."
+      }
+    ]
+  },
+  {
+    "id": "G33",
+    "question": "¿Cómo se activa TLS 1.3 en NimbusOS 4.2.0 y qué ocurrió con TLS 1.0 y 1.1?",
+    "expected_answer": "TLS 1.3 se selecciona con security.tls_min_version igual a 1.3. El mínimo por defecto sigue siendo 1.2. El valor 1.1 de ese parámetro fue eliminado, y TLS 1.0 y 1.1 ya no se admiten.",
+    "key_facts": [
+      "1.3",
+      "1.2",
+      "TLS 1.0 y 1.1"
+    ],
+    "type": "factoid",
+    "retrieval_hint": "hybrid",
+    "difficulty": "medium",
+    "relevant_docs": [
+      "NE-800",
+      "NE-420",
+      "NE-220"
+    ],
+    "relevant_files": [
+      "NE-800_Matriz_Compatibilidad_Versiones.csv",
+      "NE-420_Notas_de_Version_NimbusOS_4x.docx",
+      "NE-220_Guia_Configuracion_Parametros.docx"
+    ],
+    "evidence": [
+      {
+        "doc": "NE-800",
+        "text": "la versión mínima por defecto sigue siendo 1.2."
+      },
+      {
+        "doc": "NE-800",
+        "text": "TLS 1.0 y 1.1 ya no se admiten."
+      },
+      {
+        "doc": "NE-420",
+        "text": "Se elimina la opción security.tls_min_version: \"1.1\". TLS 1.0 y 1.1 ya no se admiten."
+      },
+      {
+        "doc": "NE-220",
+        "text": "Versión mínima de TLS. El valor 1.1 fue eliminado en 4.2.0."
       }
     ]
   }

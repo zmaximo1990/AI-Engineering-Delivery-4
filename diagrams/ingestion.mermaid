@@ -34,7 +34,7 @@ sequenceDiagram
         Note over Ingestor,Main: does not embed again
     else the index is empty
         Ingestor->>Ingestor: list_files()
-        loop each pdf, docx, md, txt, or json
+        loop each pdf, docx, md, txt, json, or csv
             Ingestor->>Extractor: extract(path)
             alt pdf
                 Extractor->>Extractor: MarkItDown
@@ -47,6 +47,8 @@ sequenceDiagram
                 Extractor->>Extractor: read_text
             else json
                 Extractor->>Extractor: render object to Markdown
+            else csv
+                Extractor->>Extractor: render rows to Markdown
             end
             Extractor-->>Ingestor: list of DocumentPage
             loop each page

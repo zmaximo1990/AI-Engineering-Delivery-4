@@ -1,7 +1,9 @@
 """Convert source assets into Markdown pages."""
 
+import csv
 import json
 import re
+from io import StringIO
 from pathlib import Path
 
 from markitdown import MarkItDown
@@ -24,7 +26,7 @@ class AssetExtractor:
     pages, so Ingestor and Chunkener stay unchanged.
     """
 
-    SUPPORTED_SUFFIXES = {".pdf", ".docx", ".md", ".txt", ".json"}
+    SUPPORTED_SUFFIXES = {".pdf", ".docx", ".md", ".txt", ".json", ".csv"}
 
     def __init__(self) -> None:
         self._converter = MarkItDown()
@@ -38,6 +40,7 @@ class AssetExtractor:
             ".md": self._extract_plain,
             ".txt": self._extract_plain,
             ".json": self._extract_json,
+            ".csv": self._extract_csv,
         }
         strategy = strategies.get(suffix)
         if strategy is None:
@@ -173,6 +176,121 @@ class AssetExtractor:
         if isinstance(value, (list, dict)):
             return len(value) == 0
         return False
+
+    def _extract_csv(self, path: Path) -> list[DocumentPage]:
+        """Extract text from a CSV file.
+
+        The first non-empty row is the header. Each later row becomes a
+        Markdown section. The heading is the first non-empty cell whose
+        column is term, title, name, heading, or id, ignoring capitalization.
+        That column is left out of the body. A CSV file has no pages.
+
+        Arguments:
+            path: Path to the CSV file.
+
+        Returns:
+            list[DocumentPage]: One page with the rendered text, or an empty list.
+
+        Raises:
+            ValueError: The file is not valid UTF-8 or CSV.
+        """
+        try:
+            with path.open(encoding="utf-8-sig", newline="") as handle:
+                raw = handle.read()
+        except UnicodeDecodeError as exc:
+            raise ValueError(f"Could not decode CSV from {path.name}") from exc
+        if not raw.strip():
+            return []
+        try:
+            records = self._csv_records(raw)
+        except csv.Error as exc:
+            raise ValueError(f"Could not parse CSV from {path.name}") from exc
+        text = self._csv_to_markdown(records).strip()
+        if not text:
+            return []
+        return [DocumentPage(text=text, page=None)]
+
+    def _csv_records(self, raw: str) -> list[dict[str, str]]:
+        """Parse CSV text into row objects. The first non-empty row is the header."""
+        try:
+            dialect = csv.Sniffer().sniff(raw[:8192], delimiters=",;\t")
+        except csv.Error:
+            dialect = csv.excel
+        reader = csv.reader(StringIO(raw, newline=""), dialect)
+        rows = [row for row in reader if any(cell.strip() for cell in row)]
+        if len(rows) < 2:
+            return []
+        columns = self._csv_columns(rows[0])
+        records: list[dict[str, str]] = []
+        width = len(columns)
+        for row in rows[1:]:
+            record: dict[str, str] = {}
+            for index, column in enumerate(columns):
+                cell = row[index] if index < len(row) else ""
+                value = self._csv_cell(cell)
+                if value:
+                    record[column] = value
+            for index, cell in enumerate(row[width:], start=width + 1):
+                value = self._csv_cell(cell)
+                if value:
+                    record[f"column {index}"] = value
+            if record:
+                records.append(record)
+        return records
+
+    def _csv_columns(self, header: list[str]) -> list[str]:
+        """Return a unique name for each header cell. A blank cell is numbered."""
+        columns: list[str] = []
+        used: set[str] = set()
+        for index, cell in enumerate(header, start=1):
+            base = self._csv_cell(cell) or f"column {index}"
+            name = base
+            suffix = 2
+            while name in used:
+                name = f"{base} {suffix}"
+                suffix += 1
+            used.add(name)
+            columns.append(name)
+        return columns
+
+    def _csv_cell(self, value: str) -> str:
+        """Return a cell as one line, with surrounding whitespace removed."""
+        return value.replace("\r\n", " ").replace("\n", " ").replace("\r", " ").strip()
+
+    def _csv_to_markdown(self, records: list[dict[str, str]]) -> str:
+        """Render each CSV row as a Markdown section.
+
+        Fields of one row stay on consecutive lines so chunking can break
+        between rows. A blank cell is omitted.
+        """
+        sections: list[str] = []
+        for record in records:
+            title, skip = self._csv_item_title(record)
+            lines = [
+                f"**{key.replace('_', ' ')}:** {value}"
+                for key, value in record.items()
+                if key != skip and value
+            ]
+            body = "\n".join(lines)
+            if title and body:
+                sections.append(f"## {title}\n\n{body}")
+            elif title:
+                sections.append(f"## {title}")
+            elif body:
+                sections.append(body)
+        return "\n\n".join(sections)
+
+    def _csv_item_title(self, record: dict[str, str]) -> tuple[str | None, str | None]:
+        """Return the section heading for a row, and the column that supplied it."""
+        by_key = {key.lower(): key for key in record}
+        for key in _JSON_TITLE_KEYS:
+            actual = by_key.get(key)
+            if actual is None:
+                continue
+            raw = record[actual].strip()
+            if raw:
+                return raw, actual
+        return None, None
 
     def _extract_docx(self, path: Path) -> list[DocumentPage]:
         """Extract text from a DOCX file.
