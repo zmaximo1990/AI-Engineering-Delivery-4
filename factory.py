@@ -40,19 +40,33 @@ class LLMFactory:
 
 
 class EmbeddingsFactory:
-    """Factory that builds an embeddings client from an EmbeddingsProvider."""
+    """Factory that returns one embeddings client for the process."""
 
-    # TODO: implement singletong like "VectorStoreFactory"
+    _client: BaseEmbeddings | None = None
 
     @staticmethod
     def create(
         provider: EmbeddingsProvider | None = None,
         model: str | None = None,
     ) -> BaseEmbeddings:
-        """Build the embeddings client that matches ``provider``.
+        """Return the process-wide embeddings client.
 
-        When ``provider`` is omitted, ``EMBEDDING_PROVIDER`` selects it.
+        The first call builds it. Later calls return the same instance so the
+        model is loaded once. When ``provider`` is omitted, ``EMBEDDING_PROVIDER``
+        selects it.
         """
+        cached = EmbeddingsFactory._client
+        if cached is not None:
+            if provider is not None and provider != cached.provider:
+                raise ValueError(
+                    f"Embeddings client already built for '{cached.provider.value}'."
+                )
+            if model is not None and model != cached.model_name:
+                raise ValueError(
+                    f"Embeddings client already built for model '{cached.model_name}'."
+                )
+            return cached
+
         selected = provider or EmbeddingsFactory.embedding_provider_from_env()
         logger.info("Creating embeddings client for provider=%s", selected.value)
 
@@ -64,6 +78,7 @@ class EmbeddingsFactory:
         else:
             raise ValueError(f"Invalid embedding provider: {selected}")
         logger.info("Embeddings client created: %s", type(client).__name__)
+        EmbeddingsFactory._client = client
         return client
 
 
