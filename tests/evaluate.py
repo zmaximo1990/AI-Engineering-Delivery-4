@@ -3,7 +3,8 @@
 Precision@k is the share of the top-k chunks that come from an expected
 document. Recall@k is the share of expected documents that appear in those
 chunks. A question with one expected document therefore has Recall@k of 1
-when that document is in the top k, and 0 otherwise.
+when that document is in the top k, and 0 otherwise. F1@k is the harmonic
+mean of that question's Precision@k and Recall@k, or 0 when both are 0.
 
 MRR@k is the mean reciprocal rank. For one question the reciprocal rank is
 1 divided by the position of the first relevant chunk in the top k, or 0
@@ -75,11 +76,13 @@ _ABSTENTION = re.compile(
 # Inclusive band on the two-decimal score. Inside it the metric is acceptable.
 # Precision is relevant chunks / k, so 0.50 means half the context comes from
 # an expected document. Recall 0.80 means most expected documents were found.
+# F1 0.60 is the harmonic mean of those two floors (about 0.62), rounded down.
 # MRR 0.50 is a first relevant chunk by rank 2, on average. Hit 0.80 means
 # four of five questions retrieved an expected document. Abstention and passes
 # use the same 0.80 floor. A hallucination signal is acceptable only at 0.
 _PRECISION_BAND = (0.50, 1.00)
 _RECALL_BAND = (0.80, 1.00)
+_F1_BAND = (0.60, 1.00)
 _MRR_BAND = (0.50, 1.00)
 _HIT_BAND = (0.80, 1.00)
 _ABSTAIN_BAND = (0.80, 1.00)
@@ -88,7 +91,7 @@ _PASS_BAND = (0.80, 1.00)
 
 @dataclass(frozen=True)
 class GoldenResult:
-    """Precision@k, Recall@k, and reciprocal rank for one golden question."""
+    """Precision@k, Recall@k, F1@k, and reciprocal rank for one golden question."""
 
     case_id: str
     useful: int
@@ -111,6 +114,17 @@ class GoldenResult:
         if self.error is not None or self.expected_count <= 0:
             return 0.0
         return self.found / self.expected_count
+
+    @property
+    def f1(self) -> float:
+        """Harmonic mean of Precision@k and Recall@k, or 0 when both are 0."""
+        if self.error is not None:
+            return 0.0
+        precision = self.precision
+        recall = self.recall
+        if precision + recall <= 0:
+            return 0.0
+        return 2 * precision * recall / (precision + recall)
 
     @property
     def reciprocal_rank(self) -> float:
@@ -314,6 +328,7 @@ def _print_golden_header(total: int, k: int) -> None:
     print(
         f"Precision@{k} = chunks from an expected document / {k}. "
         f"Recall@{k} = expected documents present in the top {k} / expected documents. "
+        f"F1@{k} = harmonic mean of Precision@{k} and Recall@{k}. "
         f"RR@{k} = 1 / rank of the first relevant chunk (0 if none). "
         f"MRR@{k} is the mean of those reciprocal ranks.",
         flush=True,
@@ -329,6 +344,7 @@ def _print_golden_row(row: GoldenResult, k: int) -> None:
         f"{row.case_id:<6} "
         f"P@{k}={row.precision:.2f} ({row.useful}/{k})  "
         f"R@{k}={row.recall:.2f} ({row.found}/{row.expected_count})  "
+        f"F1@{k}={row.f1:.2f}  "
         f"RR@{k}={row.reciprocal_rank:.2f} (rank {rank})  "
         f"retrieved={_join(row.retrieved)}  expected={_join(row.expected)}",
         flush=True,
@@ -342,6 +358,7 @@ def _print_golden_summary(rows: list[GoldenResult], k: int) -> None:
     if not scored:
         print(f"Mean Precision@{k}: n/a", flush=True)
         print(f"Mean Recall@{k}: n/a", flush=True)
+        print(f"Mean F1@{k}: n/a", flush=True)
         print(f"MRR@{k}: n/a", flush=True)
         if rows:
             print(f"Hit@{k}: 0.00 (0/{len(rows)}) {_mark(0.0, _HIT_BAND)}", flush=True)
@@ -350,10 +367,12 @@ def _print_golden_summary(rows: list[GoldenResult], k: int) -> None:
         return
     precision = _mean([row.precision for row in scored])
     recall = _mean([row.recall for row in scored])
+    f1 = _mean([row.f1 for row in scored])
     mrr = _mean([row.reciprocal_rank for row in scored])
     hit_rate = hits / len(scored)
     print(f"Mean Precision@{k}: {precision:.2f} {_mark(precision, _PRECISION_BAND)}", flush=True)
     print(f"Mean Recall@{k}: {recall:.2f} {_mark(recall, _RECALL_BAND)}", flush=True)
+    print(f"Mean F1@{k}: {f1:.2f} {_mark(f1, _F1_BAND)}", flush=True)
     print(f"MRR@{k}: {mrr:.2f} {_mark(mrr, _MRR_BAND)}", flush=True)
     print(
         f"Hit@{k}: {hit_rate:.2f} ({hits}/{len(scored)}) {_mark(hit_rate, _HIT_BAND)}",
@@ -556,7 +575,7 @@ async def run_evaluation(config: LLMConfig | None = None, k: int | None = None) 
 
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Score Precision@k, Recall@k, MRR@k, and abstention on the evaluation sets."
+        description="Score Precision@k, Recall@k, F1@k, MRR@k, and abstention on the evaluation sets."
     )
     parser.add_argument(
         "-p",

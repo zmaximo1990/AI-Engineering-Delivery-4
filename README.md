@@ -132,7 +132,7 @@ Delete `vectorstore/` to reindex that collection.
 | `schemas.py` | `LLMAnswer`, `RAGAnswer`, `DocumentPage`, providers, and `LLMConfig` |
 | `settings.py` | Proyect settings loaded from the environment (`.env` file) like chunk size, `top_k`, Pinecone names, paths, and retry settings, loaded from the environment through `Settings` |
 | `data/` | Nimbus engineering notes (PDF, DOCX, Markdown, JSON, and CSV) used as the corpus |
-| `tests/evaluate.py` | Precision@k, Recall@k, MRR@k, Hit@k, and abstention on the unanswerable set |
+| `tests/evaluate.py` | Precision@k, Recall@k, F1@k, MRR@k, Hit@k, and abstention on the unanswerable set |
 | `tests/golden_set.json` | 33 questions with the source document ids used for Precision@k and Recall@k |
 | `tests/unanswerable_set.json` | 10 questions the corpus does not answer, plus hallucination patterns |
 | `diagrams/` | Sequence diagrams for ingestion and ask flows |
@@ -235,15 +235,17 @@ python tests/evaluate.py -p gemini
 |--------|---------|
 | Precision@k | Share of the k retrieved chunks that come from an expected document |
 | Recall@k | Share of the expected documents that appear among those chunks. With one expected document this is 1 when that document is in the top k, and 0 otherwise |
+| F1@k | Harmonic mean of that question's Precision@k and Recall@k. It is 0 when both are 0. The summary is the mean of those per-question scores |
 | MRR@k | Mean reciprocal rank. Each question contributes `1 / rank` of its first relevant chunk in the top k, or 0 when that chunk is missing. Rank 1 is 1.00 and rank 2 is 0.50 |
 | Hit@k | Questions that retrieved at least one expected document |
 
-Each question prints `P@k`, `R@k`, `RR@k` (that question's reciprocal rank), the retrieved document ids, and the expected ids. The report then prints the mean Precision@k, the mean Recall@k, MRR@k, and Hit@k. Each of those means is followed by the range where it is acceptable, then ✅ when the score is inside that range and ❌ when it is outside.
+Each question prints `P@k`, `R@k`, `F1@k`, `RR@k` (that question's reciprocal rank), the retrieved document ids, and the expected ids. The report then prints the mean Precision@k, the mean Recall@k, the mean F1@k, MRR@k, and Hit@k. Each of those means is followed by the range where it is acceptable, then ✅ when the score is inside that range and ❌ when it is outside.
 
 | Metric | Acceptable |
 |--------|------------|
 | Precision@k | 0.50–1.00 |
 | Recall@k | 0.80–1.00 |
+| F1@k | 0.60–1.00 |
 | MRR@k | 0.50–1.00 |
 | Hit@k | 0.80–1.00 |
 
